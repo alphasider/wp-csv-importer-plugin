@@ -55,9 +55,8 @@
     <?php
 
     require_once(plugin_dir_path(__FILE__) . 'class/CSV_importer.php');
-    CSV_importer::get_csv();
-
-
+    $output = CSV_importer::get_csv();
+    echo $output;
   }
 
 

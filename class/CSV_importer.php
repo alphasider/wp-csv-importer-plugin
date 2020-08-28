@@ -3,31 +3,23 @@
 
   class CSV_importer {
     public static function get_csv() {
-      $file = plugin_dir_path(__DIR__);
-      $csv_file = fopen($file . 'tmp/file.csv', "r");
-      $row = 1;
-      echo $file . "<br> ";
+      $output = '<table border="1">';
+
+      $path = plugin_dir_path(__DIR__);
+      $csv_file = fopen($path . 'tmp/file.csv', "r");
 
       if ($csv_file) {
+        while (($csv_data = fgetcsv($csv_file, 1000, ',')) !== FALSE) {
 
-        echo "<table border='1'>";
-        while (($data = fgetcsv($csv_file, 1000, ",")) !== FALSE) {
-
-          $num = count($data);
-
-          echo "<p> $num fields in line $row: <br /></p>\n";
-
-          $row++;
-          print_r ($data);
-
-//          for ($i = 0; $i < $num; $i++) {
-//            echo $data[$i] ;
-//          }
-
+          $output .= "<tr>";
+          $output .= '  <td>' . $csv_data[42] . '</td>';
+          $output .= '  <td>' . $csv_data[43] . '</td>';
+          $output .= "</tr>";
         }
-        echo "</table>";
-        fclose($csv_file);
 
+        fclose($csv_file);
       }
+      $output .= '</table>';
+      return $output;
     }
   }

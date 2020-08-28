@@ -1,0 +1,3 @@
+1. Vehicle Category ID - there is only numbers, which is which?
+2. There are 45 columns (attributes) for each product and not all of them implemented in the admin area (or programmatically) - should I create them?
+3. Timestamps (vehicle/image last update) how work with them (what does they mean)?
