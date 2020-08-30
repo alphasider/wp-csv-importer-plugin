@@ -5,10 +5,16 @@
 
 
   class AdminPage {
+    /**
+     * AdminPage constructor.
+     */
     public function __construct() {
       add_action('admin_menu', [$this, 'add_menu']);
     }
 
+    /**
+     * Add menu item
+     */
     public function add_menu() {
       add_menu_page(
         'CSV Importer',
@@ -21,8 +27,11 @@
       );
     }
 
+    /**
+     * Admin page content
+     */
     public function content() {
       require_once(plugin_dir_path(__FILE__) . 'CSV.php');
-      require_once(plugin_dir_path(__DIR__) . 'view.php');
+      require_once(plugin_dir_path(__DIR__) . 'view/view.php');
     }
   }
