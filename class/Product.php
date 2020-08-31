@@ -5,13 +5,15 @@
   use WC_Product;
 
   class Product {
-    public $product;
 
-    public function __construct() {
-      return $this->product = new WC_Product();
-    }
-
-    public function set_product_main_params($csv_data = []) {
+    /**
+     * Sets product parameters
+     *
+     * @param $product
+     * @param array $csv_data
+     * @return mixed
+     */
+    public function set_product_main_params($product, $csv_data = []) {
       $dealerid = $csv_data[0]; // DealerID
       $vin = $csv_data[1]; // VIN
       $product_sku = $csv_data[2]; // StockNumber
@@ -58,36 +60,25 @@
       $imagelastupdate = $csv_data[43]; // ImageLastUpdate
       $product_category_ids = $csv_data[44]; // Vehicle Category ID
 
-      $this->product->set_name($product_name);
-      $this->product->set_status('publish');  // can be publish,draft or any wordpress post status
-      $this->product->set_description($product_description);
-      $this->product->set_sku($product_sku); //can be blank in case you don't have sku, but You can't add duplicate sku's
-      $this->product->set_price($product_price); // set product price
-//      $this->product->set_category_ids($product_category_ids); // array of category ids, You can get category id from WooCommerce Product Category Section of Wordpress Admin
-      return $this->product;
+      $product->set_name($product_name);
+      $product->set_status('publish');  // can be publish,draft or any wordpress post status
+      $product->set_description($product_description);
+      $product->set_sku($product_sku); //can be blank in case you don't have sku, but You can't add duplicate sku's
+      $product->set_price($product_price); // set product price
+
+      return $product;
     }
 
-    public function save_product() {
-      return $this->product->save();
-    }
-
-    public static function test() {
-      $data = CSV::get_csv();
-      $result = [];
-
-      foreach ($data as $row_index => $row) {
-        foreach ($row as $column_index => $column) {
-          $result[] .= $column;
-        }
-      }
-
-      return $result;
-    }
-
+    /**
+     * Creates new products from given array
+     *
+     * @param $csv_data
+     */
     public function create_products($csv_data) {
       foreach ($csv_data as $row) {
-        $this->set_product_main_params($row);
-        $this->save_product();
+        $product = new WC_Product();
+        $this->set_product_main_params($product, $row);
+        $product->save();
       }
     }
   }
