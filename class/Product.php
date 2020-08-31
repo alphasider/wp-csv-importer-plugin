@@ -75,7 +75,7 @@
       $product->set_name($product_name);
       $product->set_description($product_description);
       $product->set_sku($product_sku); //can be blank in case you don't have sku, but You can't add duplicate sku's
-      $product->set_price($product_price); // set product price
+      $product->set_regular_price($product_price); // set product price
       $product->set_status('publish');  // can be publish,draft or any wordpress post status
       $product->set_category_ids($product_category_id);
 
