@@ -2,6 +2,10 @@
 
   namespace NGS;
 
+  /**
+   * Class CSV
+   * @package NGS
+   */
   class CSV {
     /**
      * Gets array of data from CSV file
