@@ -3,6 +3,11 @@
   namespace NGS;
 
   class CSV {
+    /**
+     * Gets array of data from CSV file
+     *
+     * @return array
+     */
     public static function get_csv() {
       $output_array = [];
 
@@ -19,6 +24,12 @@
       return $output_array;
     }
 
+    /**
+     * Builds a table from all the data.
+     * For developing purposes only
+     *
+     * @return string
+     */
     public static function build_table() {
       $data = self::get_csv();
       $table = '<table border="1">';
@@ -33,14 +44,20 @@
       return $table;
     }
 
+    /**
+     * Searches for the attribute and returns whole column
+     *
+     * @param $attribute
+     * @return array
+     */
     public static function search_attribute($attribute) {
       $data = self::get_csv();
       $product_name_column_index = array_search($attribute, $data[0]);
       $result = [];
 
-      foreach ($data as $row) {
-        foreach ($row as $index => $column) {
-          if ($index == $product_name_column_index)
+      foreach ($data as $row_index => $row) {
+        foreach ($row as $column_index => $column) {
+          if ($column_index == $product_name_column_index && $row_index != 0)
             $result[] .= $column;
         }
       }
