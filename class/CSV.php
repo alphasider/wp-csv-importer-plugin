@@ -21,6 +21,7 @@
         fclose($csv_file);
       }
 
+      array_shift($output_array);
       return $output_array;
     }
 
@@ -61,6 +62,7 @@
             $result[] .= $column;
         }
       }
+
       return $result;
     }
   }
