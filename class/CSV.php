@@ -1,6 +1,6 @@
 <?php
 
-namespace NGS;
+  namespace NGS;
 
   class CSV {
     public static function get_csv() {
@@ -31,5 +31,19 @@ namespace NGS;
       }
       $table .= '</table>';
       return $table;
+    }
+
+    public static function search_attribute($attribute) {
+      $data = self::get_csv();
+      $product_name_column_index = array_search($attribute, $data[0]);
+      $result = [];
+
+      foreach ($data as $row) {
+        foreach ($row as $index => $column) {
+          if ($index == $product_name_column_index)
+            $result[] .= $column;
+        }
+      }
+      return $result;
     }
   }
