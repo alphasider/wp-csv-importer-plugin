@@ -4,6 +4,7 @@
   namespace NGS;
 
   use WC_Product;
+  use WC_Product_Attribute;
   use WC_Product_External;
   use WC_Product_Grouped;
   use WC_Product_Simple;
@@ -14,13 +15,12 @@
    * @package NGS
    */
   class Product {
-
     // Custom function for product creation (For Woocommerce 3+ only)
     public function create_product($args) {
       global $woocommerce;
 
-      if (!function_exists('wc_get_product_object_type') && !function_exists('wc_prepare_product_attributes'))
-        return false;
+//      if (!function_exists('wc_get_product_object_type') && !function_exists('wc_prepare_product_attributes'))
+//        return false;
 
       // Get an empty instance of the product object (defining it's type)
       $product = $this->wc_get_product_object_type($args['type']);
@@ -184,49 +184,51 @@
       return $data;
     }
 
-    public function create_attributes_array($csv_data) {
+    public function create_all_products($csv_data) {
+      $attribute_slugs = [
+        3 => 'car_year',
+        4 => 'make',
+        5 => 'model',
+        7 => 'condition',
+        10 => 'enginedescription',
+        11 => 'transmission',
+        12 => 'drivetrain',
+        13 => 'doors',
+        22 => 'interiorcolor',
+        23 => 'exteriorcolor',
+      ];
+      $all_attributes = [];
 
+      $cats = $this->get_category($csv_data[44]);
 
-      foreach ($csv_data as $k => $prod_data) {
-        $all_attributes = [];
-        $attr_slugs = [
-          3 => 'car_year',
-          4 => 'make',
-          5 => 'model',
-          7 => 'condition',
-          10 => 'enginedescription',
-          11 => 'transmission',
-          12 => 'drivetrain',
-          13 => 'doors',
-          22 => 'interiorcolor',
-          23 => 'exteriorcolor',
-        ];
-
-        foreach ($attr_slugs as $key => $attr_slug) {
-          $all_attributes["pa_{$attr_slug}"] = [
-            'term_names' => [$prod_data[$key]],
+      foreach ($csv_data as $product_index => $product_data) {
+        foreach ($attribute_slugs as $column_index => $slug) {
+          $all_attributes["pa_{$slug}"] = [
+            'term_names' => [$product_data[$column_index]],
             'is_visible' => true,
             'for_variation' => false,
           ];
         }
-
-        $product_id = $this->create_product(array(
+        $product_info = [
           'type' => '', // Simple product by default
-          'name' => __("The product title {$k}", "woocommerce"),
-          'description' => __("The product description…", "woocommerce"),
-          'short_description' => __("The product short description…", "woocommerce"),
-          // 'sku'                => '',
-          'regular_price' => '5.00', // product price
+          'name' => $product_data[33],
+          'description' => $product_data[32],
+          'short_description' => $product_data[32],
+           'sku'                => $product_data[2],
+          'regular_price' => $product_data[17],
           // 'sale_price'         => '',
           'reviews_allowed' => true,
           'attributes' => $all_attributes,
-//          'category_ids' => [26]
-        ));
+          'category_ids' => $cats
+        ];
+
+        $product_id = $this->create_product($product_info);
 
         // Displaying the created product ID
         echo $product_id;
       }
     }
+
 
     /**
      * Gets category id from CSV file

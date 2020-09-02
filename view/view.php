@@ -15,7 +15,7 @@
   //  $product = new Product();
   //
   //  $product->create_products($csv_data);
-
+/*
   // Custom function for product creation (For Woocommerce 3+ only)
   function create_product($args) {
     global $woocommerce;
@@ -185,10 +185,8 @@
     return $data;
   }
 
-  foreach ($csv_data as $k => $prod_data) {
-    $all_attributes = [];
-
-    $attr_slugs = [
+  function create_all_products($csv_data) {
+    $attribute_slugs = [
       3 => 'car_year',
       4 => 'make',
       5 => 'model',
@@ -200,31 +198,38 @@
       22 => 'interiorcolor',
       23 => 'exteriorcolor',
     ];
+    $all_attributes = [];
 
-    foreach ($attr_slugs as $key => $attr_slug) {
-      $all_attributes["pa_{$attr_slug}"] = [
-        'term_names' => [$prod_data[$key]],
-        'is_visible' => true,
-        'for_variation' => false,
+    foreach ($csv_data as $product_index => $product_data) {
+      foreach ($attribute_slugs as $column_index => $slug) {
+        $all_attributes["pa_{$slug}"] = [
+          'term_names' => [$product_data[$column_index]],
+          'is_visible' => true,
+          'for_variation' => false,
+        ];
+      }
+
+      $product_info = [
+        'type' => '', // Simple product by default
+        'name' => __("The product title {$product_index}", "woocommerce"),
+        'description' => __("The product description…", "woocommerce"),
+        'short_description' => __("The product short description…", "woocommerce"),
+        // 'sku'                => '',
+        'regular_price' => '5.00', // product price
+        // 'sale_price'         => '',
+        'reviews_allowed' => true,
+        'attributes' => $all_attributes,
+        'category_ids' => [26]
       ];
+
+      $product_id = create_product($product_info);
+
+      // Displaying the created product ID
+      echo $product_id;
     }
-
-    $product_id = create_product(array(
-      'type' => '', // Simple product by default
-      'name' => __("The product title {$k}", "woocommerce"),
-      'description' => __("The product description…", "woocommerce"),
-      'short_description' => __("The product short description…", "woocommerce"),
-      // 'sku'                => '',
-      'regular_price' => '5.00', // product price
-      // 'sale_price'         => '',
-      'reviews_allowed' => true,
-      'attributes' => $all_attributes,
-      'category_ids' => [26]
-    ));
-
-    // Displaying the created product ID
-    echo $product_id;
   }
-
+*/
+  $prod = new Product();
+  $prod->create_all_products($csv_data);
 
 ?>
