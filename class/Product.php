@@ -16,7 +16,7 @@
    */
   class Product {
     // Custom function for product creation (For Woocommerce 3+ only)
-    public function create_product($args) {
+    private function create_product($args) {
       global $woocommerce;
 
 //      if (!function_exists('wc_get_product_object_type') && !function_exists('wc_prepare_product_attributes'))
@@ -125,7 +125,7 @@
     }
 
     // Utility function that returns the correct product object instance
-    public function wc_get_product_object_type($type) {
+    private function wc_get_product_object_type($type) {
       // Get an instance of the WC_Product object (depending on his type)
       if (isset($args['type']) && $args['type'] === 'variable') {
         $product = new WC_Product_Variable();
@@ -144,7 +144,7 @@
     }
 
     // Utility function that prepare product attributes before saving
-    public function wc_prepare_product_attributes($attributes) {
+    private function wc_prepare_product_attributes($attributes) {
       global $woocommerce;
 
       $data = array();
@@ -199,8 +199,6 @@
       ];
       $all_attributes = [];
 
-      $cats = $this->get_category($csv_data[44]);
-
       foreach ($csv_data as $product_index => $product_data) {
         foreach ($attribute_slugs as $column_index => $slug) {
           $all_attributes["pa_{$slug}"] = [
@@ -214,21 +212,16 @@
           'name' => $product_data[33],
           'description' => $product_data[32],
           'short_description' => $product_data[32],
-           'sku'                => $product_data[2],
+          'sku' => $product_data[2],
           'regular_price' => $product_data[17],
           // 'sale_price'         => '',
           'reviews_allowed' => true,
           'attributes' => $all_attributes,
-          'category_ids' => $cats
+          'category_ids' => self::get_category($product_data[44])
         ];
-
-        $product_id = $this->create_product($product_info);
-
-        // Displaying the created product ID
-        echo $product_id;
+        $this->create_product($product_info);
       }
     }
-
 
     /**
      * Gets category id from CSV file
@@ -236,14 +229,17 @@
      * @param $categories_id
      * @return array
      */
-    private function get_category($categories_id) {
-      //1: Automotive - ID: 26
-      //2: Motorcycle - ID: 27
-      //3: Powersports - ID: 28
-      //4: Marine - ID: 29
-      //5: Commercial - ID: 30
-      //6: RV/camper - ID: 31
-      //7: Spare - ID: 59
+    private static function get_category($categories_id) {
+      /**
+       * Category ID in CSV | Category ID in WordPress | Category Name
+       * 1                  | 26                       | Automotive
+       * 2                  | 27                       | Motorcycle
+       * 3                  | 28                       | Powersports
+       * 4                  | 29                       | Marine
+       * 5                  | 30                       | Commercial
+       * 6                  | 31                       | RV/camper
+       * 7                  | 59                       | Spare
+       * */
       $category_id = [];
 
       switch ($categories_id) {
@@ -269,6 +265,7 @@
           $category_id[] .= 59;
           break;
       }
+
       return $category_id;
     }
   }
