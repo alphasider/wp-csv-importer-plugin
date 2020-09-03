@@ -2,16 +2,15 @@
 
   use NGS\CSV;
   use NGS\Product;
-  use NGS\Helper;
 
 ?>
 
 <h1>Import products from CSV</h1>
 
 <?php
-    $csv_data = CSV::get_csv();
-    $product = new Product();
+  $csv_data = CSV::get_csv();
+  $prod = new Product();
 
-    $product->create_products($csv_data);
+  $prod->create_all_products($csv_data);
 
 ?>
