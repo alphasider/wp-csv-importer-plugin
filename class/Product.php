@@ -218,13 +218,28 @@
           'short_description' => $product_data[32],
           'sku' => $product_data[2],
           'regular_price' => $product_data[17],
-          // 'sale_price'         => '',
           'reviews_allowed' => true,
           'attributes' => $all_attributes,
-          'category_ids' => self::get_category($product_data[44])
+          'category_ids' => self::get_category($product_data[44]),
+          'image_id' => self::attach_img($product_data[34])
         ];
         $this->create_product($product_info);
       }
+    }
+
+    /**
+     * Uploads images & returns ID
+     *
+     * @param $product_url
+     * @return int|mixed|string|\WP_Error
+     */
+    public static function attach_img($product_url) {
+      $imgs_url = explode(',', $product_url);
+      $image_id = null;
+      foreach ($imgs_url as $url) {
+        $image_id[] = media_sideload_image($url, 0, '', 'id');
+      }
+      return $image_id[0]; // Temporarily return the first element TODO: Fix this
     }
 
     /**
