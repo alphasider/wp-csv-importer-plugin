@@ -211,6 +211,7 @@
             'for_variation' => false,
           ];
         }
+
         $product_info = [
           'type' => '', // Simple product by default
           'name' => $product_data[33],
@@ -224,7 +225,14 @@
           'image_id' => self::attach_img($product_data[34])[0], // First image from gallery
           'gallery_ids' => self::attach_img($product_data[34])
         ];
-        $this->create_product($product_info);
+
+        $existing_product_id = Check::get_existing_product_id($product_data[2]);
+
+        $is_product_up_to_date = Check::check_modified_date($existing_product_id, $product_data[42], $product_data[43]);
+
+        if ($existing_product_id = 0 || !$is_product_up_to_date) {
+          $this->create_product($product_info);
+        }
       }
     }
 
