@@ -71,6 +71,10 @@
         $product->set_tax_class(isset($args['tax_class']) ? $args['tax_class'] : '');
       }
 
+      if (isset($args['sku'])) {
+        $product->set_sku($args['sku']);
+      }
+      echo $args['sku'] . ' - SKU <br>';
       // SKU and Stock (Not a virtual product)
       if (isset($args['virtual']) && !$args['virtual']) {
         $product->set_sku(isset($args['sku']) ? $args['sku'] : '');
