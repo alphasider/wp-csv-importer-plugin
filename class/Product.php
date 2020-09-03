@@ -74,7 +74,7 @@
       if (isset($args['sku'])) {
         $product->set_sku($args['sku']);
       }
-      echo $args['sku'] . ' - SKU <br>';
+
       // SKU and Stock (Not a virtual product)
       if (isset($args['virtual']) && !$args['virtual']) {
         $product->set_sku(isset($args['sku']) ? $args['sku'] : '');
@@ -221,7 +221,8 @@
           'reviews_allowed' => true,
           'attributes' => $all_attributes,
           'category_ids' => self::get_category($product_data[44]),
-          'image_id' => self::attach_img($product_data[34])
+          'image_id' => self::attach_img($product_data[34])[0], // First image from gallery
+          'gallery_ids' => self::attach_img($product_data[34])
         ];
         $this->create_product($product_info);
       }
@@ -239,7 +240,7 @@
       foreach ($imgs_url as $url) {
         $image_id[] = media_sideload_image($url, 0, '', 'id');
       }
-      return $image_id[0]; // Temporarily return the first element TODO: Fix this
+      return $image_id;
     }
 
     /**
