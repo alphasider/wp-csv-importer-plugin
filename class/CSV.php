@@ -10,13 +10,14 @@
     /**
      * Gets array of data from CSV file
      *
+     * @param $filename
      * @return array
      */
-    public static function get_csv() {
+    public static function get_csv($filename) {
       $output_array = [];
 
       $path = plugin_dir_path(__DIR__);
-      $csv_file = fopen($path . 'tmp/file.csv', "r");
+      $csv_file = fopen($path . "tmp/{$filename}", "r");
 
       if ($csv_file) {
         while (($csv_data = fgetcsv($csv_file, 1000, ',')) !== FALSE) {

@@ -1,22 +1,3 @@
-1. Vehicle Category ID - there is only numbers, which is which?
-2. There are 45 columns (attributes) for each product and not all of them implemented in the admin area (or programmatically) - should I create them?
-3. Timestamps (vehicle/image last update) how work with them (what does they mean)?
-
-1. Категории в файле и в админке не совпадают.
-В админке:
-Cars -- нет в файле
-Commercial
-Marine
-Motorcycle
-Powerspors
-RV/Camper
-
-В комментах:
-1: Automotive, -- нет в админке
-2: Motorcycle,
-3: Powersports,
-4: Marine,
-5: Commercial,
-6: RV/camper,
-7: Spare, -- нет в админке
-8: Spare, -- ОПЕЧАТКА? В файле только 7 категорий
+1. Import products
+2. Import photo
+3. Execute import
