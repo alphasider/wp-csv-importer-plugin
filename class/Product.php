@@ -204,6 +204,8 @@
       $all_attributes = [];
 
       foreach ($csv_data as $product_index => $product_data) {
+
+        // Preparing attributes
         foreach ($attribute_slugs as $column_index => $slug) {
           $all_attributes["pa_{$slug}"] = [
             'term_names' => [$product_data[$column_index]],
@@ -212,6 +214,7 @@
           ];
         }
 
+        // Preparing data for import
         $product_info = [
           'type' => '', // Simple product by default
           'name' => $product_data[33],
@@ -222,17 +225,38 @@
           'reviews_allowed' => true,
           'attributes' => $all_attributes,
           'category_ids' => self::get_category($product_data[44]),
-          'image_id' => self::attach_img($product_data[34])[0], // First image from gallery
-          'gallery_ids' => self::attach_img($product_data[34])
+//          'image_id' => self::attach_img($product_data[34])[0], // First image from gallery
+//          'gallery_ids' => self::attach_img($product_data[34])
         ];
 
+        // Get product ID if it exists
         $existing_product_id = Check::get_existing_product_id($product_data[2]);
 
+        // Check if product data up-to-date
         $is_product_up_to_date = Check::check_modified_date($existing_product_id, $product_data[42], $product_data[43]);
 
-        if ($existing_product_id = 0 || !$is_product_up_to_date) {
-          $this->create_product($product_info);
+        // If product doesn't exist, CREATE it
+        if ($existing_product_id == 0) {
+          $created_product_id = $this->create_product($product_info);
+          // Notify whether product has been created or not
+          self::create_product_notification($created_product_id, $product_data[2]);
+
+        } else if (!$is_product_up_to_date) {
+          // If product exists and out of date, then delete it
+
+          // Move the post (product) to the trash
+          $deleted_product = wp_trash_post($existing_product_id);
+          print_r("Product with ID: {$existing_product_id} and SKU: {$product_data[2]} has been deleted <br>");
+
+          if (is_object($deleted_product)) {
+            // If product has been deleted successfully, then recreate it with new data
+            $created_product_id = $this->create_product($product_info);
+            print_r("Product has been updated. New product ID: {$created_product_id} <br>");
+          }
+
         }
+
+
       }
     }
 
@@ -295,6 +319,18 @@
       }
 
       return $category_id;
+    }
+
+    /**
+     * @param $product_id
+     * @param $product_sku
+     */
+    private static function create_product_notification($product_id, $product_sku) {
+      if ($product_id == 0) {
+        echo "<p style='color: red'> Product with the SKU: {$product_sku}  is not created!</p>";
+      } else {
+        echo "<p style='color: green'>Product created with the ID: {$product_id}</p>";
+      }
     }
   }
 

@@ -32,6 +32,7 @@
      */
     public function content() {
       require_once(plugin_dir_path(__FILE__) . 'CSV.php');
+      require_once(plugin_dir_path(__FILE__) . 'Check.php');
       require_once(plugin_dir_path(__DIR__) . 'view/view.php');
     }
   }

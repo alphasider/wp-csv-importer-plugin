@@ -3,7 +3,10 @@
 
   namespace NGS;
 
-
+  /**
+   * Class Check
+   * @package NGS
+   */
   class Check {
     /**
      * TODO:
