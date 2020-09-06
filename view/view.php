@@ -10,18 +10,20 @@
   <h1>Import products from CSV</h1>
 
 <?php
-  //    $csv_data = CSV::get_csv();
-  //    $prod = new Product();
-  //    $prod->create_all_products($csv_data);
+//      $csv_data = CSV::get_csv('file.csv');
+//      $prod = new Product();
+//      $res = $prod->create_all_products($csv_data);
+//      print_r($res);
+  $files = new View();
 ?>
 
   <div class="container">
 
     <h3>File ready for import</h3>
-    <?php echo View::show_files_to_import() ?>
+    <?php echo $files->show_files_to_import() ?>
 
     <h3>Imported files for the last 7 days</h3>
-    <?php echo View::show_imported_files() ?>
+    <?php echo $files->show_imported_files() ?>
 
   </div>
 
@@ -43,6 +45,7 @@
 
           jQuery.post(ajaxurl, data, function (response) {
             alert('Получено с сервера: ' + response);
+            console.log(response)
           });
         })
       });

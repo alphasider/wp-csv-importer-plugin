@@ -203,8 +203,8 @@
       ];
       $all_attributes = [];
 
+      $created_products_id = [];
       foreach ($csv_data as $product_index => $product_data) {
-
         // Preparing attributes
         foreach ($attribute_slugs as $column_index => $slug) {
           $all_attributes["pa_{$slug}"] = [
@@ -228,7 +228,9 @@
 //          'image_id' => self::attach_img($product_data[34])[0], // First image from gallery
 //          'gallery_ids' => self::attach_img($product_data[34])
         ];
-
+        $created_product_id = $this->create_product($product_info);
+$created_products_id[] = $created_product_id;
+        /*
         // Get product ID if it exists
         $existing_product_id = Check::get_existing_product_id($product_data[2]);
 
@@ -240,6 +242,7 @@
           $created_product_id = $this->create_product($product_info);
           // Notify whether product has been created or not
           self::create_product_notification($created_product_id, $product_data[2]);
+          $created_products_id[] = $created_product_id;
 
         } else if (!$is_product_up_to_date) {
           // If product exists and out of date, then delete it
@@ -252,12 +255,14 @@
             // If product has been deleted successfully, then recreate it with new data
             $created_product_id = $this->create_product($product_info);
             print_r("Product has been updated. New product ID: {$created_product_id} <br>");
+            $created_products_id[] = $created_product_id;
           }
 
         }
 
-
+*/
       }
+      return $created_products_id;
     }
 
     /**
@@ -331,6 +336,10 @@
       } else {
         echo "<p style='color: green'>Product created with the ID: {$product_id}</p>";
       }
+    }
+
+    public static function hello(){
+      return [1,2,3,4];
     }
   }
 

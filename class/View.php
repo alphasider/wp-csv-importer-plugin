@@ -9,25 +9,32 @@
    */
   class View {
 
+    public $imported_files_dir = 'feed';
+    public $files_to_import_dir = 'tmp';
+
     /**
      * @param string $directory
      * @return array
      */
-    public static function get_files_from(string $directory = '') {
+    public function get_files_from(string $directory = '') {
       $path = plugin_dir_path(__DIR__) . $directory;
       $directory_content = scandir($path);
-      $files = array_diff($directory_content, ['.', '..']); // Return a files list without dots (current and parent directory paths)
+      $files = array_diff($directory_content, [".", ".."]); // Return a files list without dots (current and parent directory paths)
 
       return array_values($files); // Return re-indexed array (index starts with 0)
+//      return $directory_content;
     }
 
     /**
+     * Show files to import
+     *
      * @return string
      */
-    public static function show_files_to_import() {
-      $files = self::get_files_from('tmp');
+    public function show_files_to_import() {
+      $files = $this->get_files_from('tmp');
       $output = "";
-      if (count($files) > 1) {
+
+      if (count($files) >= 1) {
         $output .= "<table>";
         foreach ($files as $file) {
           $output .= "<tr>";
@@ -43,10 +50,12 @@
     }
 
     /**
+     * Show already imported files
+     *
      * @return string
      */
-    public static function show_imported_files() {
-      $files = self::get_files_from('feed');
+    public function show_imported_files() {
+      $files = $this->get_files_from('feed');
       $output = "";
 
       if (count($files) > 1) {
