@@ -17,13 +17,19 @@
   $files = new View();
 ?>
 
-  <div class="container">
+  <div class="container" style="display: flex">
+    <div class="left-column">
 
-    <h3>File ready for import</h3>
-    <?php echo $files->show_files_to_import() ?>
+      <h3>File ready for import</h3>
+      <?php echo $files->show_files_to_import() ?>
 
-    <h3>Imported files for the last 7 days</h3>
-    <?php echo $files->show_imported_files() ?>
+      <h3>Imported files for the last 7 days</h3>
+      <?php echo $files->show_imported_files() ?>
+    </div>
+
+    <div class="right-column" style="border: 1px solid red; padding: 10px">
+
+    </div>
 
   </div>
 
@@ -36,16 +42,15 @@
     <script>
       jQuery(document).ready(function ($) {
         jQuery('.import_now').click(function () {
-
-          console.log(jQuery(this).attr('data-filename'))
           let data = {
             action: 'import_csv',
             fileName: jQuery(this).attr('data-filename')
           };
 
           jQuery.post(ajaxurl, data, function (response) {
-            alert('Получено с сервера: ' + response);
-            console.log(response)
+            // alert('Получено с сервера: ' + response);
+            console.log(response);
+            jQuery('.right-column').html(response);
           });
         })
       });

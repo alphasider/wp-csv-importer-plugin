@@ -38,22 +38,40 @@
       $is_product_up_to_date = true;
       $post_updated_time = get_the_modified_date('Y-m-N H:i:s', $post_id);
 
-      // Get rid of unnecessary ending zeros
-      $vehicle_last_updated = substr($vehicle_last_updated, 0, strpos($vehicle_last_updated, '.'));
-      $image_last_updated = substr($image_last_updated, 0, strpos($image_last_updated, '.'));
+      // Get rid of unnecessary ending zero values
+      $vehicle_last_updated = self::clear_data($vehicle_last_updated);
+      $image_last_updated = self::clear_data($image_last_updated);
+
+      // Get last changed column
+      $up_to_date_column = self::get_files_last_modification($vehicle_last_updated, $image_last_updated);
 
       // Check if post up-to-date
-      if ($vehicle_last_updated > $image_last_updated) {
-        if ($vehicle_last_updated > $post_updated_time) {
-          $is_product_up_to_date = false;
-        }
-      } else {
-        if ($image_last_updated > $post_updated_time) {
-          $is_product_up_to_date = false;
-        }
+      if ($up_to_date_column > $post_updated_time) {
+        $is_product_up_to_date = false;
       }
 
       return $is_product_up_to_date;
+    }
+
+    /**
+     * @param $vehicle_last_updated
+     * @param $image_last_updated
+     * @return mixed
+     */
+    public static function get_files_last_modification($vehicle_last_updated, $image_last_updated) {
+      if ($vehicle_last_updated > $image_last_updated) {
+        return $vehicle_last_updated;
+      } else {
+        return $image_last_updated;
+      }
+    }
+
+    /**
+     * @param $data
+     * @return false|string
+     */
+    public static function clear_data($data){
+      return substr($data, 0, strpos($data, '.'));
     }
 
   }

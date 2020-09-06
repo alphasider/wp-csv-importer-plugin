@@ -22,7 +22,6 @@
       $files = array_diff($directory_content, [".", ".."]); // Return a files list without dots (current and parent directory paths)
 
       return array_values($files); // Return re-indexed array (index starts with 0)
-//      return $directory_content;
     }
 
     /**

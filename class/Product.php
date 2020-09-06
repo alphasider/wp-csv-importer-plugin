@@ -188,7 +188,7 @@
       return $data;
     }
 
-    public function create_all_products($csv_data) {
+    public function create_all_products($csv_data): void {
       $attribute_slugs = [
         3 => 'car_year',
         4 => 'make',
@@ -203,7 +203,6 @@
       ];
       $all_attributes = [];
 
-      $created_products_id = [];
       foreach ($csv_data as $product_index => $product_data) {
         // Preparing attributes
         foreach ($attribute_slugs as $column_index => $slug) {
@@ -228,14 +227,12 @@
 //          'image_id' => self::attach_img($product_data[34])[0], // First image from gallery
 //          'gallery_ids' => self::attach_img($product_data[34])
         ];
-        $created_product_id = $this->create_product($product_info);
-$created_products_id[] = $created_product_id;
-        /*
+
         // Get product ID if it exists
-        $existing_product_id = Check::get_existing_product_id($product_data[2]);
+        $existing_product_id = self::get_existing_product_id($product_data[2]);
 
         // Check if product data up-to-date
-        $is_product_up_to_date = Check::check_modified_date($existing_product_id, $product_data[42], $product_data[43]);
+        $is_product_up_to_date = self::check_modified_date($existing_product_id, $product_data[42], $product_data[43]);
 
         // If product doesn't exist, CREATE it
         if ($existing_product_id == 0) {
@@ -249,21 +246,18 @@ $created_products_id[] = $created_product_id;
 
           // Move the post (product) to the trash
           $deleted_product = wp_trash_post($existing_product_id);
-          print_r("Product with ID: {$existing_product_id} and SKU: {$product_data[2]} has been deleted <br>");
+          echo("Product with ID: {$existing_product_id} and SKU: {$product_data[2]} has been deleted <br>");
 
           if (is_object($deleted_product)) {
             // If product has been deleted successfully, then recreate it with new data
             $created_product_id = $this->create_product($product_info);
-            print_r("Product has been updated. New product ID: {$created_product_id} <br>");
+            echo("Product has been updated. New product ID: {$created_product_id} <br>");
             $created_products_id[] = $created_product_id;
           }
-
         }
-
-*/
       }
-      return $created_products_id;
     }
+
 
     /**
      * Uploads images & returns ID
@@ -338,9 +332,60 @@ $created_products_id[] = $created_product_id;
       }
     }
 
-    public static function hello(){
-      return [1,2,3,4];
+    /**
+     * @param $sku
+     * @return int
+     */
+    public static function get_existing_product_id($sku) {
+      return wc_get_product_id_by_sku($sku);
     }
+
+    /**
+     * @param $post_id
+     * @param $vehicle_last_updated
+     * @param $image_last_updated
+     * @return bool
+     */
+    public static function check_modified_date($post_id, $vehicle_last_updated, $image_last_updated) {
+      $is_product_up_to_date = true;
+      $post_updated_time = get_the_modified_date('Y-m-N H:i:s', $post_id);
+
+      // Get rid of unnecessary ending zero values
+      $vehicle_last_updated = self::clear_data($vehicle_last_updated);
+      $image_last_updated = self::clear_data($image_last_updated);
+
+      // Get last changed column
+      $up_to_date_column = self::get_files_last_modification($vehicle_last_updated, $image_last_updated);
+
+      // Check if post up-to-date
+      if ($up_to_date_column > $post_updated_time) {
+        $is_product_up_to_date = false;
+      }
+
+      return $is_product_up_to_date;
+    }
+
+    /**
+     * @param $vehicle_last_updated
+     * @param $image_last_updated
+     * @return mixed
+     */
+    public static function get_files_last_modification($vehicle_last_updated, $image_last_updated) {
+      if ($vehicle_last_updated > $image_last_updated) {
+        return $vehicle_last_updated;
+      } else {
+        return $image_last_updated;
+      }
+    }
+
+    /**
+     * @param $data
+     * @return false|string
+     */
+    public static function clear_data($data) {
+      return substr($data, 0, strpos($data, '.'));
+    }
+
   }
 
 
