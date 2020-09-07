@@ -188,7 +188,7 @@
       return $data;
     }
 
-    public function create_all_products($csv_data): void {
+    public function create_all_products($csv_data) {
       $attribute_slugs = [
         3 => 'car_year',
         4 => 'make',
@@ -204,6 +204,11 @@
       $all_attributes = [];
 
       foreach ($csv_data as $product_index => $product_data) {
+        $sku = $product_data[2];
+        $category_id = $product_data[44];
+        $vehicle_updated_time = $product_data[42];
+        $image_updated_time = $product_data[43];
+
         // Preparing attributes
         foreach ($attribute_slugs as $column_index => $slug) {
           $all_attributes["pa_{$slug}"] = [
@@ -219,39 +224,39 @@
           'name' => $product_data[33],
           'description' => $product_data[32],
           'short_description' => $product_data[32],
-          'sku' => $product_data[2],
+          'sku' => $sku,
           'regular_price' => $product_data[17],
           'reviews_allowed' => true,
           'attributes' => $all_attributes,
-          'category_ids' => self::get_category($product_data[44]),
+          'category_ids' => self::get_category($category_id),
 //          'image_id' => self::attach_img($product_data[34])[0], // First image from gallery
 //          'gallery_ids' => self::attach_img($product_data[34])
         ];
 
         // Get product ID if it exists
-        $existing_product_id = self::get_existing_product_id($product_data[2]);
+        $existing_product_id = self::get_existing_product_id($sku);
 
         // Check if product data up-to-date
-        $is_product_up_to_date = self::check_modified_date($existing_product_id, $product_data[42], $product_data[43]);
+        $is_product_up_to_date = self::check_modified_date($existing_product_id, $vehicle_updated_time, $image_updated_time);
 
         // If product doesn't exist, CREATE it
         if ($existing_product_id == 0) {
           $created_product_id = $this->create_product($product_info);
           // Notify whether product has been created or not
-          self::create_product_notification($created_product_id, $product_data[2]);
-          $created_products_id[] = $created_product_id;
+          echo self::show_create_product_notification($created_product_id, $sku);
+          $created_products_id[$sku] = self::show_create_product_notification($created_product_id, $sku);
 
         } else if (!$is_product_up_to_date) {
           // If product exists and out of date, then delete it
 
           // Move the post (product) to the trash
           $deleted_product = wp_trash_post($existing_product_id);
-          echo("Product with ID: {$existing_product_id} and SKU: {$product_data[2]} has been deleted <br>");
+//          echo("Product with ID: {$existing_product_id} and SKU: {$sku} has been deleted <br>");
 
           if (is_object($deleted_product)) {
             // If product has been deleted successfully, then recreate it with new data
             $created_product_id = $this->create_product($product_info);
-            echo("Product has been updated. New product ID: {$created_product_id} <br>");
+            echo self::show_product_update_notification($created_product_id);
             $created_products_id[] = $created_product_id;
           }
         }
@@ -323,13 +328,22 @@
     /**
      * @param $product_id
      * @param $product_sku
+     * @return string
      */
-    private static function create_product_notification($product_id, $product_sku) {
+    private static function show_create_product_notification($product_id, $product_sku) {
       if ($product_id == 0) {
-        echo "<p style='color: red'> Product with the SKU: {$product_sku}  is not created!</p>";
+        return "<p  class='notification notification_failure'> Product with the SKU: {$product_sku}  is not created!</p>";
       } else {
-        echo "<p style='color: green'>Product created with the ID: {$product_id}</p>";
+        return "<p  class='notification notification_success'>Product created with the ID: {$product_id}</p>";
       }
+    }
+
+    /**
+     * @param $created_product_id
+     * @return string
+     */
+    private static function show_product_update_notification($created_product_id) {
+      return "<p class='notification notification_success'>Product has been updated. New product ID: {$created_product_id}</p>";
     }
 
     /**

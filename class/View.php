@@ -27,10 +27,16 @@
     /**
      * Show files to import
      *
+     * @param string $import_type
      * @return string
      */
-    public function show_files_to_import() {
-      $files = $this->get_files_from('tmp');
+    public function show_files_to_import(string $import_type = 'new') {
+      if ($import_type == 'new') {
+        $files = $this->get_files_from('tmp');
+      } else {
+        $files = $this->get_files_from('feed');
+      }
+
       $output = "";
 
       if (count($files) >= 1) {
@@ -38,7 +44,7 @@
         foreach ($files as $file) {
           $output .= "<tr>";
           $output .= "  <td> {$file} </td>";
-          $output .= "  <td> <a href='#' class='import_now' data-filename='{$file}'>Import now</a> </td>";
+          $output .= "  <td> <a href='#' class='import_now' data-filename='{$file}'>Import</a> </td>";
           $output .= "</tr>";
         }
         $output .= "</table>";
@@ -47,32 +53,6 @@
       }
       return $output;
     }
-
-    /**
-     * Show already imported files
-     *
-     * @return string
-     */
-    public function show_imported_files() {
-      $files = $this->get_files_from('feed');
-      $output = "";
-
-      if (count($files) > 1) {
-        $output .= "<table>";
-        foreach ($files as $file) {
-          $output .= "<tr>";
-          $output .= "  <td> {$file} </td>";
-          $output .= "  <td> <a href='#'>Reimport</a></td>";
-          $output .= "</tr>";
-        }
-        $output .= "</table>";
-      } else {
-        $output = "No files have been imported yet";
-      }
-
-      return $output;
-    }
-
   }
 
   new View();

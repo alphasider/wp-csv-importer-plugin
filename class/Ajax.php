@@ -26,7 +26,11 @@
       $product = new Product();
       $all_products = $product->create_all_products($csv_data);
 
+      // Move CSV file after import
+//      CSV::move_imported_file($file_to_import);
+
       echo $all_products;
+
       wp_die();
     }
   }

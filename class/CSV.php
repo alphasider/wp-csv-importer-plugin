@@ -7,6 +7,7 @@
    * @package NGS
    */
   class CSV {
+
     /**
      * Gets array of data from CSV file
      *
@@ -69,5 +70,9 @@
       }
 
       return $result;
+    }
+
+    public static function move_imported_file($file) {
+      rename(plugin_dir_path( __DIR__) . "tmp/{$file}" , plugin_dir_path(__DIR__) . "feed/{$file}");
     }
   }
