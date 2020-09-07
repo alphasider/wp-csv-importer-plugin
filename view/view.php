@@ -25,7 +25,7 @@
     </div>
     <div class="table-wrapper">
       <h2>Imported files for the last 7 days</h2>
-      <?php echo $files->show_files_to_import('recovery') ?>
+      <?php echo $files->show_files_to_import('restore') ?>
     </div>
   </div>
 
@@ -48,7 +48,8 @@
         jQuery('.import_now').click(function () {
           let data = {
             action: 'import_csv',
-            fileName: jQuery(this).attr('data-filename')
+            fileName: jQuery(this).attr('data-filename'),
+            importType: jQuery(this).attr('data-importType')
           };
 
           jQuery.post(ajaxurl, data, function (response) {
@@ -56,8 +57,6 @@
             console.log(response);
 
             jQuery('.notifications-area').html(response);
-
-
           });
         })
       });

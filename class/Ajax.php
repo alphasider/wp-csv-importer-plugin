@@ -21,15 +21,15 @@
      */
     public function import_csv_callback() {
       $file_to_import = $_POST['fileName'];
+      $import_type = $_POST['importType'];
 
-      $csv_data = CSV::get_csv($file_to_import);
+      $csv_data = CSV::get_csv($file_to_import, $import_type);
       $product = new Product();
       $all_products = $product->create_all_products($csv_data);
 
       // Move CSV file after import
 //      CSV::move_imported_file($file_to_import);
 
-      echo $all_products;
 
       wp_die();
     }

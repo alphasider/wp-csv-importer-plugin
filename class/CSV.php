@@ -12,13 +12,19 @@
      * Gets array of data from CSV file
      *
      * @param $filename
+     * @param $import_type
      * @return array
      */
-    public static function get_csv($filename) {
+    public static function get_csv($filename, $import_type) {
       $output_array = [];
+      if ($import_type == 'new') {
+        $import_type = 'tmp';
+      } else {
+        $import_type = 'feed';
+      }
 
       $path = plugin_dir_path(__DIR__);
-      $csv_file = fopen($path . "tmp/{$filename}", "r");
+      $csv_file = fopen($path . "{$import_type}/{$filename}", "r");
 
       if ($csv_file) {
         while (($csv_data = fgetcsv($csv_file, 1000, ',')) !== FALSE) {
@@ -73,6 +79,6 @@
     }
 
     public static function move_imported_file($file) {
-      rename(plugin_dir_path( __DIR__) . "tmp/{$file}" , plugin_dir_path(__DIR__) . "feed/{$file}");
+      rename(plugin_dir_path(__DIR__) . "tmp/{$file}", plugin_dir_path(__DIR__) . "feed/{$file}");
     }
   }

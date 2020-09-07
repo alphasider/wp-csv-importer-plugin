@@ -30,11 +30,12 @@
      * @param string $import_type
      * @return string
      */
-    public function show_files_to_import(string $import_type = 'new') {
+    public function show_files_to_import(string $import_type = '') {
+      $files = '';
       if ($import_type == 'new') {
-        $files = $this->get_files_from('tmp');
-      } else {
-        $files = $this->get_files_from('feed');
+        $files = $this->get_files_from($this->files_to_import_dir);
+      } else if ($import_type == 'restore') {
+        $files = $this->get_files_from($this->imported_files_dir);
       }
 
       $output = "";
@@ -44,7 +45,7 @@
         foreach ($files as $file) {
           $output .= "<tr>";
           $output .= "  <td> {$file} </td>";
-          $output .= "  <td> <a href='#' class='import_now' data-filename='{$file}'>Import</a> </td>";
+          $output .= "  <td> <a href='#' class='import_now' data-filename='{$file}' data-importType='{$import_type}'>Import</a> </td>";
           $output .= "</tr>";
         }
         $output .= "</table>";
