@@ -32,7 +32,11 @@
   <div class="right-column">
     <h2 class="heading-2">Results</h2>
     <div class="notifications-area">
-      <div class="default-text">The results will be displayed here</div>
+      <div class="default-text show">The results will be displayed here</div>
+    </div>
+    <div class="loader-wrapper">
+      <div class="loader-text">Please be patient, it may take a long time</div>
+      <div class="loader "></div>
     </div>
   </div>
 
@@ -46,6 +50,8 @@
     <script>
       jQuery(document).ready(function ($) {
         jQuery('.import-btn').click(function () {
+          jQuery('.default-text').removeClass('show');
+          jQuery('.loader-wrapper').addClass('show');
           let data = {
             action: 'import_csv',
             fileName: jQuery(this).attr('data-filename'),
@@ -53,8 +59,8 @@
           };
 
           jQuery.post(ajaxurl, data, function (response) {
-            // alert('Получено с сервера: ' + response);
             console.log(response);
+            jQuery('.loader-wrapper').removeClass('show');
 
             jQuery('.notifications-area').html(response);
           });
@@ -77,9 +83,10 @@
         width: 33%;
     }
 
-    .heading-2{
+    .heading-2 {
         font-size: 22px;
     }
+
     .table-wrapper {
         margin-bottom: 45px;
     }
@@ -87,6 +94,7 @@
     .right-column {
         width: 65%;
         justify-items: flex-end;
+        position: relative;
     }
 
     .notifications-area {
@@ -97,15 +105,63 @@
         border-radius: 10px;
         background-color: #fff;
         overflow: auto;
+        position: relative;
     }
 
     .default-text {
-        display: flex;
-        justify-content: center;
-        align-items: center;
         height: 100%;
         font-size: 18px;
         color: rgba(0, 0, 0, .3);
+    }
+
+    .default-text {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+    }
+
+    .default-text.show,
+    .loader-wrapper.show {
+        display: flex;
+    }
+
+    .loader-wrapper {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        flex-direction: column-reverse;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+    }
+
+    .loader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 2s linear infinite;
+        margin-bottom: 10px;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
     }
 
     .notification {
@@ -222,7 +278,7 @@
         font-size: 1rem;
         line-height: 1.5;
         border-radius: .25rem;
-        transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
         text-decoration: none;
         cursor: pointer;
     }
@@ -232,9 +288,10 @@
         background-color: #36304a;
         border-color: #36304a;
     }
-    
-    .column3{
+
+    .column3 {
         text-align: center;
     }
+
 
 </style>
