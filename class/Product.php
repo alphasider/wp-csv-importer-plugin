@@ -256,7 +256,7 @@
           if (is_object($deleted_product)) {
             // If product has been deleted successfully, then recreate it with new data
             $created_product_id = $this->create_product($product_info);
-            echo self::show_product_update_notification($created_product_id);
+            echo self::show_product_update_notification($created_product_id, $sku);
             $created_products_id[] = $created_product_id;
           }
         }
@@ -332,9 +332,9 @@
      */
     private static function show_create_product_notification($product_id, $product_sku) {
       if ($product_id == 0) {
-        return "<p  class='notification notification_failure'> Product with the SKU: {$product_sku}  is not created!</p>";
+        return "<p  class='notification notification_failure'>Could not add a new product. <b>SKU: {$product_sku} </b> has not created!</p>";
       } else {
-        return "<p  class='notification notification_success'>Product created with the ID: {$product_id}</p>";
+        return "<p  class='notification notification_success'>Added new product. <b>SKU: {$product_sku}</b> | <b>ID: {$product_id}</b></p>";
       }
     }
 
@@ -342,8 +342,8 @@
      * @param $created_product_id
      * @return string
      */
-    private static function show_product_update_notification($created_product_id) {
-      return "<p class='notification notification_success'>Product has been updated. New product ID: {$created_product_id}</p>";
+    private static function show_product_update_notification($created_product_id, $product_sku) {
+      return "<p class='notification notification_success'>Product has been updated. <b>SKU: {$product_sku}</b> | <b>ID: {$created_product_id}</b></p>";
     }
 
     /**
@@ -391,6 +391,8 @@
         return $image_last_updated;
       }
     }
+
+
 
     /**
      * @param $data

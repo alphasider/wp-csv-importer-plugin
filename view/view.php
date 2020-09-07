@@ -70,7 +70,7 @@
     .container {
         display: flex;
         justify-content: space-between;
-        margin-right: 20px;
+        margin-right: 30px;
     }
 
     .left-column {
@@ -93,20 +93,23 @@
         border-radius: 10px;
         background-color: #fff;
     }
-.default-text{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    font-size: 18px;
-    color: rgba(0,0,0,.3);
-}
-    .notification{
+
+    .default-text {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        font-size: 18px;
+        color: rgba(0, 0, 0, .3);
+    }
+
+    .notification {
         padding: .75rem 1.25rem;
         font-size: 15px;
         border: 1px solid transparent;
         border-radius: .25rem;
     }
+
     .notification_success {
         color: #155724;
         background-color: #d4edda;
@@ -118,6 +121,7 @@
         background-color: #f8d7da;
         border-color: #f5c6cb;
     }
+
     table {
         border-spacing: 1;
         border-collapse: collapse;
@@ -173,7 +177,7 @@
 
 
     .table100-head th {
-        font-family: OpenSans-Regular;
+        font-family: OpenSans-Regular, sans-serif;
         font-size: 18px;
         color: #fff;
         line-height: 1.2;
@@ -185,7 +189,7 @@
     }
 
     tbody tr {
-        font-family: OpenSans-Regular;
+        font-family: OpenSans-Regular, sans-serif;
         font-size: 15px;
         color: #808080;
         line-height: 1.2;
@@ -197,11 +201,31 @@
         background-color: #f5f5f5;
         cursor: pointer;
     }
-tbody a{
-    outline: transparent;
-}
-    tbody a:hover {
+
+    tbody a {
+        display: inline-block;
+        font-weight: 400;
+        color: #007bff;
+        border: 1px solid #007bff;
+        background-color: transparent;
+        text-align: center;
+        vertical-align: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: .25rem;
+        transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
         text-decoration: none;
+    }
+
+    tbody a:hover {
+        color: #fff;
+        background-color: #0069d9;
+        border-color: #0062cc;
     }
 
 </style>

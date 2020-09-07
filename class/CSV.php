@@ -17,14 +17,9 @@
      */
     public static function get_csv($filename, $import_type) {
       $output_array = [];
-      if ($import_type == 'new') {
-        $import_type = 'tmp';
-      } else {
-        $import_type = 'feed';
-      }
+      $path_to_file = self::get_proper_file($filename, $import_type);
 
-      $path = plugin_dir_path(__DIR__);
-      $csv_file = fopen($path . "{$import_type}/{$filename}", "r");
+      $csv_file = fopen(plugin_dir_path(__DIR__) . $path_to_file, "r");
 
       if ($csv_file) {
         while (($csv_data = fgetcsv($csv_file, 1000, ',')) !== FALSE) {
@@ -81,4 +76,38 @@
     public static function move_imported_file($file) {
       rename(plugin_dir_path(__DIR__) . "tmp/{$file}", plugin_dir_path(__DIR__) . "feed/{$file}");
     }
+
+    /**
+     * Sets files' last modified date today
+     *
+     * @param $filename
+     * @param $import_type
+     * @return bool
+     */
+    public static function set_modified_date($filename, $import_type) {
+      $file = self::get_proper_file($filename, $import_type);
+      $full_path = plugin_dir_path( __DIR__) . $file;
+      return touch($full_path);
+    }
+
+    /**
+     * Gets proper file from proper directory
+     * returns as: folder_name/file_name
+     *
+     * @param $filename
+     * @param $import_type
+     * @return string
+     */
+    public static function get_proper_file($filename, $import_type) {
+
+      if ($import_type == 'new') {
+        $import_type = 'tmp';
+      } else {
+        $import_type = 'feed';
+      }
+
+      return (string)"{$import_type}/{$filename}";
+
+    }
+
   }

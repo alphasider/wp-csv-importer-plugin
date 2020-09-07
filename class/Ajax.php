@@ -21,7 +21,7 @@
      */
     public function import_csv_callback() {
       $file_to_import = $_POST['fileName'];
-      $import_type = $_POST['importType'];
+      $import_type = $_POST['importType']; // Might be: New Import or Re-Import
 
       $csv_data = CSV::get_csv($file_to_import, $import_type);
       $product = new Product();
@@ -29,6 +29,8 @@
 
       // Move CSV file after import
 //      CSV::move_imported_file($file_to_import);
+
+      var_dump(CSV::set_modified_date($file_to_import, $import_type));
 
 
       wp_die();
