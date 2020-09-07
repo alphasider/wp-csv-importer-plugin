@@ -78,16 +78,24 @@
     }
 
     /**
-     * Sets files' last modified date today
+     * Sets file's last modified date today
      *
      * @param $filename
      * @param $import_type
      * @return bool
      */
     public static function set_modified_date($filename, $import_type) {
+      // returns "dir/file"
       $file = self::get_proper_file($filename, $import_type);
-      $full_path = plugin_dir_path( __DIR__) . $file;
+      $full_path = plugin_dir_path(__DIR__) . $file;
       return touch($full_path);
+    }
+
+    public static function get_files_last_modified_time($filename, $import_type) {
+      $file = self::get_proper_file($filename, $import_type);
+      $full_path = plugin_dir_path(__DIR__) . $file;
+      $timestamp = filemtime($full_path);
+      return date('Y-m-N H:i:s', $timestamp);
     }
 
     /**

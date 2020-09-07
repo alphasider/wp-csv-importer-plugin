@@ -20,17 +20,17 @@
 <div class="container" style="display: flex">
   <div class="left-column">
     <div class="table-wrapper">
-      <h2>File ready for import</h2>
+      <h2 class="heading-2">File ready for import</h2>
       <?php echo $files->show_files_to_import('new') ?>
     </div>
     <div class="table-wrapper">
-      <h2>Imported files for the last 7 days</h2>
+      <h2 class="heading-2">Imported files for the last 7 days</h2>
       <?php echo $files->show_files_to_import('restore') ?>
     </div>
   </div>
 
   <div class="right-column">
-    <h2>Results</h2>
+    <h2 class="heading-2">Results</h2>
     <div class="notifications-area">
       <div class="default-text">The results will be displayed here</div>
     </div>
@@ -45,7 +45,7 @@
     ?>
     <script>
       jQuery(document).ready(function ($) {
-        jQuery('.import_now').click(function () {
+        jQuery('.import-btn').click(function () {
           let data = {
             action: 'import_csv',
             fileName: jQuery(this).attr('data-filename'),
@@ -77,6 +77,9 @@
         width: 33%;
     }
 
+    .heading-2{
+        font-size: 22px;
+    }
     .table-wrapper {
         margin-bottom: 45px;
     }
@@ -89,9 +92,11 @@
     .notifications-area {
         max-width: 100%;
         height: 100%;
+        max-height: 70vh;
         padding: 10px 13px;
         border-radius: 10px;
         background-color: #fff;
+        overflow: auto;
     }
 
     .default-text {
@@ -142,12 +147,12 @@
     }
 
     table thead tr {
-        height: 60px;
+        height: 50px;
         background: #36304a;
     }
 
     table tbody tr {
-        height: 50px;
+        /*height: 50px;*/
     }
 
     table tbody tr:last-child {
@@ -176,7 +181,7 @@
     }
 
 
-    .table100-head th {
+    .table-head th {
         font-family: OpenSans-Regular, sans-serif;
         font-size: 18px;
         color: #fff;
@@ -199,14 +204,13 @@
     tbody tr:hover {
         color: #555555;
         background-color: #f5f5f5;
-        cursor: pointer;
     }
 
-    tbody a {
+    .import-btn {
         display: inline-block;
         font-weight: 400;
-        color: #007bff;
-        border: 1px solid #007bff;
+        color: #36304a;
+        border: 1px solid #36304a;
         background-color: transparent;
         text-align: center;
         vertical-align: middle;
@@ -214,18 +218,23 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
-        padding: .375rem .75rem;
+        padding: 5px 15px;
         font-size: 1rem;
         line-height: 1.5;
         border-radius: .25rem;
         transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
         text-decoration: none;
+        cursor: pointer;
     }
 
     tbody a:hover {
         color: #fff;
-        background-color: #0069d9;
-        border-color: #0062cc;
+        background-color: #36304a;
+        border-color: #36304a;
+    }
+    
+    .column3{
+        text-align: center;
     }
 
 </style>

@@ -332,7 +332,7 @@
      */
     private static function show_create_product_notification($product_id, $product_sku) {
       if ($product_id == 0) {
-        return "<p  class='notification notification_failure'>Could not add a new product. <b>SKU: {$product_sku} </b> has not created!</p>";
+        return "<p  class='notification notification_failure'>Could not add a new product. <b>SKU: {$product_sku} </b> has not been created!</p>";
       } else {
         return "<p  class='notification notification_success'>Added new product. <b>SKU: {$product_sku}</b> | <b>ID: {$product_id}</b></p>";
       }
