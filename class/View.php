@@ -69,12 +69,18 @@
             $output .= "<td> " . CSV::get_files_last_modified_time($file, $import_type) . "</td>";
           };
 
-          $output .= "  <td> <button class='import-btn' data-filename='{$file}' data-importType='{$import_type}'>Import</button> </td>";
-          $output .= "</tr>";
+          $output .= "  <td>";
+          if ($import_type !== 'new') {
+            $output .= "<button class='import-btn' data-filename='{$file}' data-importType='{$import_type}'>Import</button>";
+          } else {
+            $output .= " <div class='scheduled-label'> Scheduled</div > ";
+          }
+          $output .= "     </td > ";
+          $output .= "</tr > ";
         }
 
-        $output .= "  </tbody>";
-        $output .= "</table>";
+        $output .= "  </tbody > ";
+        $output .= "</table > ";
       } else {
         $output = "There is no files to import";
       }

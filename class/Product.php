@@ -121,14 +121,16 @@
 
 
       // Images and Gallery
-      $product->set_image_id(isset($args['image_id']) ? $args['image_id'] : "");
-      $product->set_gallery_image_ids(isset($args['gallery_ids']) ? $args['gallery_ids'] : array());
+//      $product->set_image_id(isset($args['image_id']) ? $args['image_id'] : "");
+//      $product->set_gallery_image_ids(isset($args['gallery_ids']) ? $args['gallery_ids'] : array());
 
       ## --- SAVE PRODUCT --- ##
       return $product->save();
     }
 
     /**
+     * Sets custom fields values
+     *
      * @param $product_id
      * @param $csv_data
      */
@@ -153,7 +155,7 @@
       $video = $csv_data[37];
 
       // Adding data to the custom fields
-      update_field('field_vin', $stock_id, $vin);
+      update_field('field_vin', $vin, $product_id);
       update_field('field_stock_id', $stock_id, $product_id);
       update_field('field_make', $make, $product_id);
       update_field('field_model', $model, $product_id);
@@ -272,7 +274,7 @@
           'sku' => $sku,
           'regular_price' => $product_data[17],
           'reviews_allowed' => true,
-          'attributes' => $all_attributes,
+//          'attributes' => $all_attributes,
           'category_ids' => self::get_category($category_id),
 //          'image_id' => self::attach_img($product_data[34])[0], // First image from gallery
 //          'gallery_ids' => self::attach_img($product_data[34])
@@ -309,7 +311,6 @@
         }
       }
     }
-
 
     /**
      * Uploads images & returns ID

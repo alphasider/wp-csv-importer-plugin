@@ -5,6 +5,7 @@
   /**
    * Plugin Name: CSV importer
    * Description: Adds a custom admin pages with sample styles and scripts.
+   * Version: 2.0.
    */
 
   function csv_importer_init() {

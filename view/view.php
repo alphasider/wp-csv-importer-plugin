@@ -94,6 +94,9 @@
         margin-bottom: 45px;
     }
 
+    .scheduled-label{
+        line-height: 2.5;
+    }
     .right-column {
         width: 57%;
     }
