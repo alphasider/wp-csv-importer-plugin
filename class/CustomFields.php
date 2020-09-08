@@ -34,6 +34,17 @@
           'hide_on_screen' => '',
         ));
 
+        // VIN
+        acf_add_local_field(array(
+          'key' => 'field_vin',
+          'label' => 'VIN',
+          'name' => 'vin',
+          'type' => 'text',
+          'parent' => 'group_vehicle_details',
+          'instructions' => '',
+          'required' => 0,
+        ));
+
         // Stock ID
         acf_add_local_field(array(
           'key' => 'field_stock_id',

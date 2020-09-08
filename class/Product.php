@@ -133,6 +133,7 @@
      * @param $csv_data
      */
     private function set_custom_fields_values($product_id, $csv_data) {
+      $vin = $csv_data[1];
       $stock_id = $csv_data[2];
       $make = $csv_data[4];
       $model = $csv_data[5];
@@ -152,6 +153,7 @@
       $video = $csv_data[37];
 
       // Adding data to the custom fields
+      update_field('field_vin', $stock_id, $vin);
       update_field('field_stock_id', $stock_id, $product_id);
       update_field('field_make', $make, $product_id);
       update_field('field_model', $model, $product_id);
