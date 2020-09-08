@@ -15,26 +15,7 @@
   //      $res = $prod->create_all_products($csv_data);
   //      print_r($res);
   $files = new View();
-
-  $csv_data = CSV::get_csv('file.csv', 'new');
-  $csv_file_products_sku = CSV::get_sku_from_csv($csv_data);
-
-  $all_published_products = Product::get_all_published_products();
-  $published_products_sku = Product::get_all_published_products_sku($all_published_products);
-
-
-  asort($csv_file_products_sku);
-  asort($published_products_sku);
-
-
-  echo '<pre>';
-  print_r(array_diff($published_products_sku, $csv_file_products_sku));
-//print_r(array_diff($arr1, $arr2));
-//  print_r($csv_file_products_sku);
-//  print_r($published_products_sku);
-//  var_dump($diff);
-  echo '</pre>';
-
+  new \NGS\CustomFields();
 ?>
 
 <div class="container" style="display: flex">
@@ -51,12 +32,14 @@
 
   <div class="right-column">
     <h2 class="heading-2">Results</h2>
-    <div class="notifications-area">
-      <div class="default-text show">The results will be displayed here</div>
-    </div>
-    <div class="loader-wrapper">
-      <div class="loader-text">Please be patient, it may take a long time</div>
-      <div class="loader "></div>
+    <div class="right-column__content">
+      <div class="notifications-area">
+        <div class="default-text show">The results will be displayed here</div>
+      </div>
+      <div class="loader-wrapper">
+        <div class="loader-text">Please be patient, it may take a long time</div>
+        <div class="loader "></div>
+      </div>
     </div>
   </div>
 
@@ -100,7 +83,7 @@
     }
 
     .left-column {
-        width: 33%;
+        width: 40%;
     }
 
     .heading-2 {
@@ -112,9 +95,14 @@
     }
 
     .right-column {
-        width: 65%;
+        width: 57%;
+    }
+
+    .right-column__content {
+        height: 100%;
         justify-items: flex-end;
         position: relative;
+
     }
 
     .notifications-area {
@@ -151,15 +139,16 @@
     }
 
     .loader-wrapper {
-        display: none;
         position: absolute;
         top: 0;
         left: 0;
+        height: 100%;
+        width: 100%;
+        display: none;
         flex-direction: column-reverse;
         justify-content: center;
         align-items: center;
-        height: 100%;
-        width: 100%;
+        /*background-color: rgba(255, 255, 255, .5);*/
     }
 
     .loader {

@@ -7,10 +7,8 @@
   use WC_Product_Attribute;
   use WC_Product_External;
   use WC_Product_Grouped;
-  use WC_Product_Query;
   use WC_Product_Simple;
   use WC_Product_Variable;
-  use WP_Query;
 
   /**
    * Class Product
@@ -130,6 +128,49 @@
       return $product->save();
     }
 
+    /**
+     * @param $product_id
+     * @param $csv_data
+     */
+    private function set_custom_fields_values($product_id, $csv_data) {
+      $stock_id = $csv_data[2];
+      $make = $csv_data[4];
+      $model = $csv_data[5];
+      $year = $csv_data[3];
+      $mileage = $csv_data[8];
+      $engine = $csv_data[10];
+      $color = $csv_data[22];
+      $interior_color = $csv_data[23];
+      $transmission = $csv_data[11];
+      $drivetrain = $csv_data[12];
+      $doors = $csv_data[13];
+      $condition = $csv_data[7];
+      $body_type = $csv_data[14];
+      $trim = $csv_data[6];
+      $description = $csv_data[32];
+      $standard_features = $csv_data[30];
+      $video = $csv_data[37];
+
+      // Adding data to the custom fields
+      update_field('field_stock_id', $stock_id, $product_id);
+      update_field('field_make', $make, $product_id);
+      update_field('field_model', $model, $product_id);
+      update_field('field_year', $year, $product_id);
+      update_field('field_mileage', $mileage, $product_id);
+      update_field('field_engine', $engine, $product_id);
+      update_field('field_color', $color, $product_id);
+      update_field('field_interior_color', $interior_color, $product_id);
+      update_field('field_transmission', $transmission, $product_id);
+      update_field('field_drivetrain', $drivetrain, $product_id);
+      update_field('field_doors', $doors, $product_id);
+      update_field('field_condition', $condition, $product_id);
+      update_field('field_body_type', $body_type, $product_id);
+      update_field('field_trim', $trim, $product_id);
+      update_field('field_description', $description, $product_id);
+      update_field('field_standard_features', $standard_features, $product_id);
+      update_field('field_video', $video, $product_id);
+    }
+
     // Utility function that returns the correct product object instance
     private function wc_get_product_object_type($type) {
       // Get an instance of the WC_Product object (depending on his type)
@@ -190,9 +231,6 @@
       return $data;
     }
 
-    /**
-     * @param $csv_data
-     */
     public function create_all_products($csv_data) {
       $attribute_slugs = [
         3 => 'car_year',
@@ -234,8 +272,8 @@
           'reviews_allowed' => true,
           'attributes' => $all_attributes,
           'category_ids' => self::get_category($category_id),
-          'image_id' => self::attach_img($product_data[34])[0], // First image from gallery
-          'gallery_ids' => self::attach_img($product_data[34])
+//          'image_id' => self::attach_img($product_data[34])[0], // First image from gallery
+//          'gallery_ids' => self::attach_img($product_data[34])
         ];
 
         // Get product ID if it exists
@@ -246,10 +284,12 @@
 
         // If product doesn't exist, CREATE it
         if ($existing_product_id == 0) {
+
           $created_product_id = $this->create_product($product_info);
+          $this->set_custom_fields_values($created_product_id, $product_data);
+
           // Notify whether product has been created or not
           echo self::show_create_product_notification($created_product_id, $sku);
-          $created_products_id[$sku] = self::show_create_product_notification($created_product_id, $sku);
 
         } else if (!$is_product_up_to_date) {
           // If product exists and out of date, then delete it
@@ -261,12 +301,13 @@
           if (is_object($deleted_product)) {
             // If product has been deleted successfully, then recreate it with new data
             $created_product_id = $this->create_product($product_info);
+            $this->set_custom_fields_values($created_product_id, $product_data);
             echo self::show_product_update_notification($created_product_id, $sku);
-            $created_products_id[] = $created_product_id;
           }
         }
       }
     }
+
 
     /**
      * Uploads images & returns ID
@@ -336,7 +377,7 @@
      */
     private static function show_create_product_notification($product_id, $product_sku) {
       if ($product_id == 0) {
-        return "<p class='notification notification_failure'>Could not add a new product. <b>SKU: {$product_sku} </b> has not been created!</p>";
+        return "<p  class='notification notification_failure'>Could not add a new product. <b>SKU: {$product_sku} </b> has not been created!</p>";
       } else {
         return "<p  class='notification notification_success'>Added new product. <b>SKU: {$product_sku}</b> | <b>ID: {$product_id}</b></p>";
       }
@@ -356,13 +397,6 @@
      */
     public static function get_existing_product_id($sku) {
       return wc_get_product_id_by_sku($sku);
-    }
-
-    public static function delete_sold_product($product_id) {
-      $deleted_post = wp_trash_post($product_id);
-      if ($deleted_post !== false || $deleted_post !== null) {
-        return "<p class='notification notification_success'>Product successfully deleted!</p>";
-      }
     }
 
     /**
@@ -403,6 +437,7 @@
       }
     }
 
+
     /**
      * @param $data
      * @return false|string
@@ -410,21 +445,6 @@
     public static function clear_data($data) {
       return substr($data, 0, strpos($data, '.'));
     }
-
-
-    public static function get_all_published_products() {
-      $wc_query = new WC_Product_Query();
-      return $wc_query->get_products();
-    }
-
-    public static function get_all_published_products_sku($products) {
-      $output = [];
-      foreach ($products as $product) {
-        $output[$product->id] = $product->sku;
-      }
-      return $output;
-    }
-
 
   }
 

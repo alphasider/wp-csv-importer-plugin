@@ -27,17 +27,8 @@
       $product = new Product();
       $all_products = $product->create_all_products($csv_data);
 
-      // Compare this
-      $all_published_products = Product::get_all_published_products();
-      $published_products_sku = Product::get_all_published_products_sku($all_published_products);
-
-
-      // With this
-      $csv_file_products_sku = CSV::get_sku_from_csv($csv_data);
-
-
       // Move CSV file after import
-      // CSV::move_imported_file($file_to_import);
+//      CSV::move_imported_file($file_to_import);
 
       // Set modified time to imported file's
       CSV::set_modified_date($file_to_import, $import_type);
