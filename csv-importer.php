@@ -4,7 +4,7 @@
 
   /**
    * Plugin Name: CSV importer
-   * Description: Adds a custom admin pages with sample styles and scripts.
+   * Description: Allows to import products from csv files automatically.
    */
 
   function csv_importer_init() {

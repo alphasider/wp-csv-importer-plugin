@@ -7,8 +7,10 @@
   use WC_Product_Attribute;
   use WC_Product_External;
   use WC_Product_Grouped;
+  use WC_Product_Query;
   use WC_Product_Simple;
   use WC_Product_Variable;
+  use WP_Query;
 
   /**
    * Class Product
@@ -188,6 +190,9 @@
       return $data;
     }
 
+    /**
+     * @param $csv_data
+     */
     public function create_all_products($csv_data) {
       $attribute_slugs = [
         3 => 'car_year',
@@ -229,8 +234,8 @@
           'reviews_allowed' => true,
           'attributes' => $all_attributes,
           'category_ids' => self::get_category($category_id),
-//          'image_id' => self::attach_img($product_data[34])[0], // First image from gallery
-//          'gallery_ids' => self::attach_img($product_data[34])
+          'image_id' => self::attach_img($product_data[34])[0], // First image from gallery
+          'gallery_ids' => self::attach_img($product_data[34])
         ];
 
         // Get product ID if it exists
@@ -262,7 +267,6 @@
         }
       }
     }
-
 
     /**
      * Uploads images & returns ID
@@ -332,7 +336,7 @@
      */
     private static function show_create_product_notification($product_id, $product_sku) {
       if ($product_id == 0) {
-        return "<p  class='notification notification_failure'>Could not add a new product. <b>SKU: {$product_sku} </b> has not been created!</p>";
+        return "<p class='notification notification_failure'>Could not add a new product. <b>SKU: {$product_sku} </b> has not been created!</p>";
       } else {
         return "<p  class='notification notification_success'>Added new product. <b>SKU: {$product_sku}</b> | <b>ID: {$product_id}</b></p>";
       }
@@ -352,6 +356,13 @@
      */
     public static function get_existing_product_id($sku) {
       return wc_get_product_id_by_sku($sku);
+    }
+
+    public static function delete_sold_product($product_id) {
+      $deleted_post = wp_trash_post($product_id);
+      if ($deleted_post !== false || $deleted_post !== null) {
+        return "<p class='notification notification_success'>Product successfully deleted!</p>";
+      }
     }
 
     /**
@@ -392,8 +403,6 @@
       }
     }
 
-
-
     /**
      * @param $data
      * @return false|string
@@ -401,6 +410,21 @@
     public static function clear_data($data) {
       return substr($data, 0, strpos($data, '.'));
     }
+
+
+    public static function get_all_published_products() {
+      $wc_query = new WC_Product_Query();
+      return $wc_query->get_products();
+    }
+
+    public static function get_all_published_products_sku($products) {
+      $output = [];
+      foreach ($products as $product) {
+        $output[$product->id] = $product->sku;
+      }
+      return $output;
+    }
+
 
   }
 

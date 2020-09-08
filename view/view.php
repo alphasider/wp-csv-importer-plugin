@@ -15,6 +15,26 @@
   //      $res = $prod->create_all_products($csv_data);
   //      print_r($res);
   $files = new View();
+
+  $csv_data = CSV::get_csv('file.csv', 'new');
+  $csv_file_products_sku = CSV::get_sku_from_csv($csv_data);
+
+  $all_published_products = Product::get_all_published_products();
+  $published_products_sku = Product::get_all_published_products_sku($all_published_products);
+
+
+  asort($csv_file_products_sku);
+  asort($published_products_sku);
+
+
+  echo '<pre>';
+  print_r(array_diff($published_products_sku, $csv_file_products_sku));
+//print_r(array_diff($arr1, $arr2));
+//  print_r($csv_file_products_sku);
+//  print_r($published_products_sku);
+//  var_dump($diff);
+  echo '</pre>';
+
 ?>
 
 <div class="container" style="display: flex">

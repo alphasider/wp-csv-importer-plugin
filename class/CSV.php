@@ -118,4 +118,11 @@
 
     }
 
+    public static function get_sku_from_csv($csv_data){
+      $csv_data_sku = [];
+      foreach ($csv_data as $row) {
+        $csv_data_sku[] = $row[2];
+      }
+      return $csv_data_sku;
+    }
   }
