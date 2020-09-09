@@ -46,10 +46,8 @@
 </div>
 
 <?php
-
   add_action('admin_print_footer_scripts', 'import_csv_javascript', 99);
-  function import_csv_javascript() {
-    ?>
+  function import_csv_javascript() { ?>
     <script>
       jQuery(document).ready(function ($) {
         jQuery('.import-btn').click(function () {
@@ -70,10 +68,7 @@
         })
       });
     </script>
-    <?php
-  }
-
-?>
+  <?php } ?>
 
 <style>
     .container {
@@ -94,9 +89,10 @@
         margin-bottom: 45px;
     }
 
-    .scheduled-label{
+    .scheduled-label {
         line-height: 2.5;
     }
+
     .right-column {
         width: 57%;
     }
