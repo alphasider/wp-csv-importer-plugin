@@ -10,12 +10,18 @@
 <h1>Import products from CSV</h1>
 
 <?php
-  //      $csv_data = CSV::get_csv('file.csv');
+
+  //        echo '<pre>';
+  //        print_r($csv_data);
+  //        echo '</pre>';
   //      $prod = new Product();
   //      $res = $prod->create_all_products($csv_data);
   //      print_r($res);
   $files = new View();
   new \NGS\CustomFields();
+
+
+
 ?>
 
 <div class="container" style="display: flex">
@@ -34,10 +40,10 @@
     <h2 class="heading-2">Results</h2>
     <div class="right-column__content">
       <div class="notifications-area">
-        <div class="default-text show">The results will be displayed here</div>
+        <div class="default-text show">Notifications area</div>
       </div>
       <div class="loader-wrapper">
-        <div class="loader-text">Please be patient, it may take a long time</div>
+        <div class="loader-text">The process has started, it may take a long time</div>
         <div class="loader "></div>
       </div>
     </div>

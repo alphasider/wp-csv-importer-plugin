@@ -3,13 +3,19 @@
 
   namespace NGS;
 
-
+  /**
+   * Class CustomFields
+   * @package NGS
+   */
   class CustomFields {
 
     public function __construct() {
       add_action('acf/init', [$this, 'register_custom_acf_fields']);
     }
 
+    /**
+     * Registers new custom fields locally
+     */
     public function register_custom_acf_fields() {
       if (function_exists('acf_add_local_field_group')) {
 
