@@ -89,7 +89,7 @@
           'label' => 'Year',
           'name' => 'year',
           'type' => 'text',
-          'parent' => 'group_person_details',
+          'parent' => 'group_vehicle_details',
           'instructions' => '',
           'required' => 0,
         ));
