@@ -62,76 +62,11 @@
           'required' => 0,
         ));
 
-        // Make
-        acf_add_local_field(array(
-          'key' => 'field_make',
-          'label' => 'Make',
-          'name' => 'make',
-          'type' => 'text',
-          'parent' => 'group_vehicle_details',
-          'instructions' => '',
-          'required' => 0,
-        ));
-        // Make
-        acf_add_local_field(array(
-          'key' => 'field_model',
-          'label' => 'Model',
-          'name' => 'model',
-          'type' => 'text',
-          'parent' => 'group_vehicle_details',
-          'instructions' => '',
-          'required' => 0,
-        ));
-
-        // Year
-        acf_add_local_field(array(
-          'key' => 'field_year',
-          'label' => 'Year',
-          'name' => 'year',
-          'type' => 'text',
-          'parent' => 'group_vehicle_details',
-          'instructions' => '',
-          'required' => 0,
-        ));
-
-        // Mileage
-        acf_add_local_field(array(
-          'key' => 'field_mileage',
-          'label' => 'Mileage',
-          'name' => 'mileage',
-          'type' => 'text',
-          'parent' => 'group_vehicle_details',
-          'instructions' => '',
-          'required' => 0,
-        ));
-
         // Engine
         acf_add_local_field(array(
           'key' => 'field_engine',
           'label' => 'Engine',
           'name' => 'engine',
-          'type' => 'text',
-          'parent' => 'group_vehicle_details',
-          'instructions' => '',
-          'required' => 0,
-        ));
-
-        // Color
-        acf_add_local_field(array(
-          'key' => 'field_color',
-          'label' => 'Color',
-          'name' => 'color',
-          'type' => 'text',
-          'parent' => 'group_vehicle_details',
-          'instructions' => '',
-          'required' => 0,
-        ));
-
-        // Interior Color
-        acf_add_local_field(array(
-          'key' => 'field_interior_color',
-          'label' => 'Interior Color',
-          'name' => 'interior_color',
           'type' => 'text',
           'parent' => 'group_vehicle_details',
           'instructions' => '',
@@ -165,17 +100,6 @@
           'key' => 'field_doors',
           'label' => 'Doors',
           'name' => 'doors',
-          'type' => 'text',
-          'parent' => 'group_vehicle_details',
-          'instructions' => '',
-          'required' => 0,
-        ));
-
-        // Condition
-        acf_add_local_field(array(
-          'key' => 'field_condition',
-          'label' => 'Condition',
-          'name' => 'condition',
           'type' => 'text',
           'parent' => 'group_vehicle_details',
           'instructions' => '',

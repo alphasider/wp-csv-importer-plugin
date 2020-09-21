@@ -41,6 +41,30 @@
         $product_description = $product_data[32];
         $product_short_description = $product_data[32];
 
+
+        $attribute_slugs = [
+          3 => 'car_year',
+          4 => 'make',
+          5 => 'model',
+          7 => 'condition',
+          8 => 'mileage',
+          22 => 'interiorcolor',
+          23 => 'exteriorcolor',
+          31 => 'location'
+        ];
+        $all_attributes = [];
+
+        self::add_all_attributes_to_wp($attribute_slugs, $product_data);
+
+        // Preparing attributes
+        foreach ($attribute_slugs as $column_index => $slug) {
+          $all_attributes["pa_{$slug}"] = [
+            'term_names' => [$product_data[$column_index]],
+            'is_visible' => true,
+            'for_variation' => false,
+          ];
+        }
+
         // Preparing data for import
         $product_info = [
           'type' => 'simple',
@@ -50,8 +74,9 @@
           'sku' => $sku,
           'regular_price' => $regular_price,
           'category_ids' => self::get_category($category_id),
-//          'image_id' => $image_id,
-//          'gallery_ids' => $gallery_ids
+          'attributes' => $all_attributes,
+          'image_id' => $image_id,
+          'gallery_ids' => $gallery_ids
         ];
 
         // Get product ID if it exists
@@ -386,6 +411,18 @@
       return $is_product_up_to_date;
     }
 
+    /**
+     * Adds all possible attribute values to wp to assign them later
+     *
+     * @param $attributes
+     * @param $product_info
+     */
+    public static function add_all_attributes_to_wp($attributes, $product_info) {
+      foreach ($attributes as $column_num => $attribute) {
+        wp_insert_term($product_info[$column_num], "pa_{$attribute}");
+      }
+    }
+
 
     /*** UTILITY Methods ***/
 
@@ -412,6 +449,53 @@
       else
         return $product;
     }
+
+    /**
+     * Utility function that prepare product attributes before saving
+     *
+     * @param $attributes
+     * @return array
+     */
+    private function wc_prepare_product_attributes( $attributes ){
+      global $woocommerce;
+
+      $data = array();
+      $position = 0;
+
+      foreach( $attributes as $taxonomy => $values ){
+        if( ! taxonomy_exists( $taxonomy ) )
+          continue;
+
+        // Get an instance of the WC_Product_Attribute Object
+        $attribute = new WC_Product_Attribute();
+
+        $term_ids = array();
+
+        // Loop through the term names
+        foreach( $values['term_names'] as $term_name ){
+          if( term_exists( $term_name, $taxonomy ) )
+            // Get and set the term ID in the array from the term name
+            $term_ids[] = get_term_by( 'name', $term_name, $taxonomy )->term_id;
+          else
+            continue;
+        }
+
+        $taxonomy_id = wc_attribute_taxonomy_id_by_name( $taxonomy ); // Get taxonomy ID
+
+        $attribute->set_id( $taxonomy_id );
+        $attribute->set_name( $taxonomy );
+        $attribute->set_options( $term_ids );
+        $attribute->set_position( $position );
+        $attribute->set_visible( $values['is_visible'] );
+        $attribute->set_variation( $values['for_variation'] );
+
+        $data[$taxonomy] = $attribute; // Set in an array
+
+        $position++; // Increase position
+      }
+      return $data;
+    }
+
 
     /**
      * Gets category id from CSV file
