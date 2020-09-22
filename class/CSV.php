@@ -20,10 +20,10 @@
     public static function get_csv($filename, $import_type) {
       $path_to_file = self::get_proper_file($filename, $import_type);
 
-      if (filesize($filename) == 0) {
-        unlink($filename);
-        return;
-      }
+//      if (filesize($filename) == 0) {
+//        unlink($filename);
+//        return;
+//      }
 
       $output_array = [];
 

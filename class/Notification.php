@@ -16,7 +16,7 @@
      * @param $created_product_id
      */
     public static function created_new_product_succeed($product_sku, $created_product_id) {
-      echo "<p  class='notification notification_success'>Added new product. <b>SKU: {$product_sku}</b> | <b>ID: {$created_product_id}</b></p>";
+      echo "<p  class='notification notification_success'>Added a new product. <b>SKU: {$product_sku}</b> | <b>ID: {$created_product_id}</b></p>";
     }
 
     /**

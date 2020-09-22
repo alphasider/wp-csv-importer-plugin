@@ -35,7 +35,7 @@
         <div class="default-text show">Notifications area</div>
       </div>
       <div class="loader-wrapper">
-        <div class="loader-text">The process has started, it may take a long time</div>
+        <div class="loader-text">The process has been started, it may take a long time</div>
         <div class="loader "></div>
       </div>
     </div>

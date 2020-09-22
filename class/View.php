@@ -37,14 +37,15 @@
 
       if ($import_type == 'new') {
         $files = $this->get_files_from($this->files_to_import_dir);
-        $file_size = filesize(plugin_dir_path(__DIR__) . "{$this->files_to_import_dir}/{$files[0]}"); // FIXME: File to chose is hardcoded
+
       } else if ($import_type == 'restore') {
         $files = $this->get_files_from($this->imported_files_dir);
       }
 
+
       $output = "";
 
-      if (count($files) >= 1 && $file_size !== 0) {
+      if (count($files) >= 1 && $file_size !== 0 && (count($files) > 0)) {
 
         $output .= "<table>";
 

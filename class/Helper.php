@@ -216,8 +216,8 @@
         'regular_price' => $regular_price,
         'category_ids' => $category_ids,
         'attributes' => $all_attributes,
-//          'image_id' => $image_id,
-//          'gallery_ids' => $gallery_ids
+        'image_id' => $image_id,
+        'gallery_ids' => $gallery_ids
       ];
     }
 
