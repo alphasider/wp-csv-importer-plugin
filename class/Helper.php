@@ -179,15 +179,7 @@
     public static function delete_sold_out_products($products) {
       foreach ($products as $product_id => $product_sku) {
         $post_object = wp_trash_post($product_id);
-        self::notify_deleted_product_delete($post_object, $product_id, $product_sku);
-      }
-    }
-
-    public static function notify_deleted_product_delete($post_object, $product_id, $product_sku) {
-      if ($post_object !== false || $post_object !== null) {
-        return "<p class='notification notification_success'>The product has successfully deleted! <b>ID: {$product_id}</b> | <b>SKU: {$product_sku}</b> </p>";
-      } else {
-        return "<p class='notification notification_success'>The product not deleted! <b>ID: {$product_id}</b> | <b>SKU: {$product_sku}</b> </p>";
+        Notification::delete_sold_out_product_status($post_object, $product_id, $product_sku);
       }
     }
 
@@ -197,6 +189,74 @@
         $output[] = $row[2];
       }
       return $output;
+    }
+
+    /**
+     * Prepares data for create product function
+     *
+     * @param $product_name
+     * @param $product_description
+     * @param $product_short_description
+     * @param $sku
+     * @param $regular_price
+     * @param $category_ids
+     * @param $all_attributes
+     * @param $image_id
+     * @param $gallery_ids
+     * @param string $product_type
+     * @return array
+     */
+    public static function prepare_data($product_name, $product_description, $product_short_description, $sku, $regular_price, $category_ids, $all_attributes, $image_id, $gallery_ids, $product_type = 'simple') {
+      return [
+        'type' => $product_type,
+        'name' => $product_name,
+        'description' => $product_description,
+        'short_description' => $product_short_description,
+        'sku' => $sku,
+        'regular_price' => $regular_price,
+        'category_ids' => $category_ids,
+        'attributes' => $all_attributes,
+//          'image_id' => $image_id,
+//          'gallery_ids' => $gallery_ids
+      ];
+    }
+
+    /**
+     * Creates proper array of attributes
+     *
+     * @param $attribute_slugs
+     * @param $product_row
+     * @return array
+     */
+    public static function make_attributes($attribute_slugs, $product_row) {
+      $output = [];
+      foreach ($attribute_slugs as $column_index => $slug) {
+        $output["pa_{$slug}"] = [
+          'term_names' => [$product_row[$column_index]],
+          'is_visible' => true,
+          'for_variation' => false,
+        ];
+      }
+      return $output;
+    }
+
+    /**
+     * Gets main data from the right columns, and assigns correct values
+     *
+     * @param $column
+     * @return array
+     */
+    public static function extract_main_data($column) {
+      return [
+        'sku' => $column[2],
+        'category_id' => $column[44],
+        'vehicle_updated_time' => $column[42],
+        'image_updated_time' => $column[43],
+        'regular_price' => $column[17],
+        'product_name' => $column[33],
+        'product_description' => $column[32],
+        'product_short_description' => $column[32]
+      ];
     }
 
   }

@@ -29,12 +29,11 @@
 
       echo $all_products;
 
-
       // Move CSV file after import
-//      CSV::move_imported_file($file_to_import);
+      CSV::move_imported_file($file_to_import);
 
       // Set modified time to imported file's
-//      CSV::set_modified_date($file_to_import, $import_type);
+      CSV::set_modified_date($file_to_import, $import_type);
 
       wp_die();
     }

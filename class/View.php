@@ -33,17 +33,18 @@
     public function show_files_to_import(string $import_type) {
 
       $files = '';
+      $file_size = null;
 
       if ($import_type == 'new') {
         $files = $this->get_files_from($this->files_to_import_dir);
+        $file_size = filesize(plugin_dir_path(__DIR__) . "{$this->files_to_import_dir}/{$files[0]}"); // FIXME: File to chose is hardcoded
       } else if ($import_type == 'restore') {
         $files = $this->get_files_from($this->imported_files_dir);
       }
 
-
       $output = "";
 
-      if (count($files) >= 1) {
+      if (count($files) >= 1 && $file_size !== 0) {
 
         $output .= "<table>";
 
@@ -69,12 +70,11 @@
           };
 
           $output .= "  <td>";
+          if ($import_type !== 'new') {
             $output .= "<button class='import-btn' data-filename='{$file}' data-importType='{$import_type}'>Import</button>";
-//          if ($import_type !== 'new') {
-//            $output .= "<button class='import-btn' data-filename='{$file}' data-importType='{$import_type}'>Import</button>";
-//          } else {
-//            $output .= " <div class='scheduled-label'> Scheduled</div > ";
-//          }
+          } else {
+            $output .= " <div class='scheduled-label'> Scheduled</div > ";
+          }
           $output .= "     </td > ";
           $output .= "</tr > ";
         }

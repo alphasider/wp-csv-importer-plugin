@@ -2,6 +2,8 @@
 
   namespace NGS;
 
+  use NGS\Notification;
+
   /**
    * Class CSV
    * @package NGS
@@ -13,11 +15,17 @@
      *
      * @param $filename
      * @param $import_type
-     * @return array
+     * @return array|void
      */
     public static function get_csv($filename, $import_type) {
-      $output_array = [];
       $path_to_file = self::get_proper_file($filename, $import_type);
+
+      if (filesize($filename) == 0) {
+        unlink($filename);
+        return;
+      }
+
+      $output_array = [];
 
       $csv_file = fopen(plugin_dir_path(__DIR__) . $path_to_file, "r");
 
@@ -33,48 +41,26 @@
     }
 
     /**
-     * Builds a table from all the data.
-     * For developing purposes only
+     * Gets file size
      *
-     * @return string
+     * @param $file
+     * @return false|int
      */
-    public static function build_table() {
-      $data = self::get_csv();
-      $table = '<table border="1">';
-      foreach ($data as $row) {
-        $table .= '<tr>';
-        foreach ($row as $column) {
-          $table .= "<td>{$column}</td>";
-        }
-        $table .= '</tr>';
-      }
-      $table .= '</table>';
-      return $table;
+    public static function get_file_size($file){
+      return filesize($file);
     }
 
     /**
-     * Searches for the attribute and returns whole column
+     * Moves files
      *
-     * @param $attribute
-     * @return array
+     * @param $file
      */
-    public static function search_attribute($attribute) {
-      $data = self::get_csv();
-      $product_name_column_index = array_search($attribute, $data[0]);
-      $result = [];
-
-      foreach ($data as $row_index => $row) {
-        foreach ($row as $column_index => $column) {
-          if ($column_index == $product_name_column_index && $row_index != 0)
-            $result[] .= $column;
-        }
-      }
-
-      return $result;
-    }
-
     public static function move_imported_file($file) {
-      rename(plugin_dir_path(__DIR__) . "tmp/{$file}", plugin_dir_path(__DIR__) . "feed/{$file}");
+      $copied = copy(plugin_dir_path(__DIR__) . "tmp/{$file}", plugin_dir_path(__DIR__) . "feed/{$file}");
+
+      if ($copied) {
+        unlink(plugin_dir_path(__DIR__) . "tmp/{$file}");
+      }
     }
 
     /**
@@ -107,7 +93,6 @@
      * @return string
      */
     public static function get_proper_file($filename, $import_type) {
-
       if ($import_type == 'new') {
         $import_type = 'tmp';
       } else {
@@ -115,7 +100,6 @@
       }
 
       return (string)"{$import_type}/{$filename}";
-
     }
 
   }

@@ -6,6 +6,7 @@
   use WC_Data_Exception;
 
   require('Helper.php');
+  require('Notification.php');
 
   /**
    * Class Product
@@ -31,144 +32,55 @@
      * @throws WC_Data_Exception
      */
     public function import_all_products($csv_data) {
-      /**
-       * TODO: uncomment to detect & delete sold out products
-       *
-       * $sold_out_products = Helper::detect_sold_out_products($csv_data);
-       * Helper::delete_sold_out_products($sold_out_products);
-       */
+
+      $sold_out_products = Helper::detect_sold_out_products($csv_data);
+      Helper::delete_sold_out_products($sold_out_products);
 
       foreach ($csv_data as $product_index => $product_data) {
 
-        $main_data = self::extract_main_data($product_data);
+        $main_data = Helper::extract_main_data($product_data);
 
         /**
          * @var $sku
-         * @var $image_id
-         * @var $gallery_ids
          * @var $category_id
          * @var $product_name
          * @var $regular_price
+         * @var $image_updated_time
          * @var $product_description
+         * @var $vehicle_updated_time
          * @var $product_short_description
          */
         extract($main_data);
 
-        $category_ids = Helper::get_categories($category_id);
-        $all_attributes = self::make_attributes($this->attribute_slugs, $product_data);
+        $image_id = self::attach_img($product_data[34])[0]; // First image from gallery
+        $gallery_ids = self::attach_img($product_data[34]);
 
-        /**
-         * TODO: uncomment
-         *
-         * self::add_all_attributes_to_wp($attribute_slugs, $product_data);
-         */
+        $category_ids = Helper::get_categories($category_id);
+        $all_attributes = Helper::make_attributes($this->attribute_slugs, $product_data);
+
+        self::add_all_attributes_to_wp($this->attribute_slugs, $product_data);
 
         // Preparing data for import
-        $prepared_data = self::prepare_data($product_name, $product_description, $product_short_description, $sku, $regular_price, $category_ids, $all_attributes, $image_id, $gallery_ids);
+        $prepared_data = Helper::prepare_data($product_name, $product_description, $product_short_description, $sku, $regular_price, $category_ids, $all_attributes, $image_id, $gallery_ids);
+        // Get product ID if it exists
+        $existing_product_id = Helper::get_existing_product_id($sku);
 
-        echo $this->create_product_with_additional_data($prepared_data, $product_data, $sku);
-        /**
-         * TODO: uncomment
-         *
-         * // Get product ID if it exists
-         * $existing_product_id = Helper::get_existing_product_id($sku);
-         */
+        // Check if product data up-to-date
+        $is_product_up_to_date = self::check_is_product_up_to_date($existing_product_id, $vehicle_updated_time, $image_updated_time);
 
-        /**
-         * TODO: uncomment
-         * // Check if product data up-to-date
-         * $is_product_up_to_date = self::check_is_product_up_to_date($existing_product_id, $vehicle_updated_time, $image_updated_time);
-         */
+        if ($existing_product_id == 0) {
+          // If product doesn't exist, CREATE it
+          $this->create_product_with_additional_data($prepared_data, $product_data, $sku);
+        } else if (!$is_product_up_to_date) {
+          // If product exists and out of date, then delete it (move the post (product) to the trash)
+          $deleted_product = $this->delete_product($existing_product_id);
 
-        /**
-         * TODO: uncomment
-         *
-         * // If product doesn't exist, CREATE it
-         * if ($existing_product_id == 0) {
-         * $this->create_product_with_additional_data($prepared_data, $product_data, $sku);
-         * } else if (!$is_product_up_to_date) {
-         * // If product exists and out of date, then delete it
-         *
-         * // Move the post (product) to the trash
-         * $deleted_product = $this->delete_product($existing_product_id);
-         *
-         * // If product has been deleted successfully, then recreate it with new data
-         * if (is_object($deleted_product)) {
-         * $this->update_product($prepared_data, $product_data, $sku);
-         * }
-         * }
-         */
+          if (is_object($deleted_product)) {
+            // If product has been deleted successfully, then recreate it with new data
+            $this->update_product($prepared_data, $product_data, $sku);
+          }
+        }
       }
-    }
-
-    /**
-     * Prepares data for create product function
-     *
-     * @param $product_name
-     * @param $product_description
-     * @param $product_short_description
-     * @param $sku
-     * @param $regular_price
-     * @param $category_ids
-     * @param $all_attributes
-     * @param $image_id
-     * @param $gallery_ids
-     * @param string $product_type
-     * @return array
-     */
-    public static function prepare_data($product_name, $product_description, $product_short_description, $sku, $regular_price, $category_ids, $all_attributes, $image_id, $gallery_ids, $product_type = 'simple') {
-      return [
-        'type' => $product_type,
-        'name' => $product_name,
-        'description' => $product_description,
-        'short_description' => $product_short_description,
-        'sku' => $sku,
-        'regular_price' => $regular_price,
-        'category_ids' => $category_ids,
-        'attributes' => $all_attributes,
-//          'image_id' => $image_id,
-//          'gallery_ids' => $gallery_ids
-      ];
-    }
-
-    /**
-     * Creates proper array of attributes
-     *
-     * @param $attribute_slugs
-     * @param $product_row
-     * @return array
-     */
-    public static function make_attributes($attribute_slugs, $product_row) {
-      $output = [];
-      foreach ($attribute_slugs as $column_index => $slug) {
-        $output["pa_{$slug}"] = [
-          'term_names' => [$product_row[$column_index]],
-          'is_visible' => true,
-          'for_variation' => false,
-        ];
-      }
-      return $output;
-    }
-
-    /**
-     * Gets main data from the right columns, and assigns correct values
-     *
-     * @param $column
-     * @return array
-     */
-    public static function extract_main_data($column) {
-      return [
-        'sku' => $column[2],
-        'category_id' => $column[44],
-        'vehicle_updated_time' => $column[42],
-        'image_updated_time' => $column[43],
-        'regular_price' => $column[17],
-        'image_id' => self::attach_img($column[34])[0], // First image from gallery
-        'gallery_ids' => self::attach_img($column[34]),
-        'product_name' => $column[33],
-        'product_description' => $column[32],
-        'product_short_description' => $column[32]
-      ];
     }
 
     /**
@@ -304,9 +216,9 @@
       $this->set_custom_fields_values($created_product_id, $product_data);
 
       if ($created_product_id == 0) {
-        return "<p  class='notification notification_failure'>Could not add a new product. <b>SKU: {$product_sku} </b> has not been created!</p>";
+        Notification::create_new_product_failed($product_sku);
       } else {
-        return "<p  class='notification notification_success'>Added new product. <b>SKU: {$product_sku}</b> | <b>ID: {$created_product_id}</b></p>";
+        Notification::created_new_product_succeed($product_sku, $created_product_id);
       }
 
     }
@@ -317,15 +229,14 @@
      * @param $prepared_data
      * @param $product_data
      * @param $product_sku
-     * @return string
      * @throws WC_Data_Exception
-     */// TODO: uncomment to update products
-    /*public function update_product($prepared_data, $product_data, $product_sku) {
+     */
+    public function update_product($prepared_data, $product_data, $product_sku) {
       $created_product_id = $this->create_product($prepared_data);
       $this->set_custom_fields_values($created_product_id, $product_data);
 
-      return "<p class='notification notification_success'>Product has been updated. <b>SKU: {$product_sku}</b> | <b>ID: {$created_product_id}</b></p>";
-    }*/
+      Notification::update_product_succeed($product_sku, $created_product_id);
+    }
 
     /**
      * Deletes product
