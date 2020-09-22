@@ -89,7 +89,7 @@
      * @param $categories_id
      * @return array
      */
-    public static function get_category($categories_id) {
+    public static function get_categories($categories_id) {
       /**
        * Category ID in CSV | Category ID in WordPress | Category Name
        * 1                  | 26                       | Automotive

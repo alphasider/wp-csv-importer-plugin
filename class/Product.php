@@ -54,7 +54,7 @@
          */
         extract($main_data);
 
-        $categories_id = Helper::get_category($category_id);
+        $category_ids = Helper::get_categories($category_id);
         $all_attributes = self::make_attributes($this->attribute_slugs, $product_data);
 
         /**
@@ -64,7 +64,7 @@
          */
 
         // Preparing data for import
-        $prepared_data = self::prepare_data($product_name, $product_description, $product_short_description, $sku, $regular_price, $categories_id, $all_attributes, $image_id, $gallery_ids);
+        $prepared_data = self::prepare_data($product_name, $product_description, $product_short_description, $sku, $regular_price, $category_ids, $all_attributes, $image_id, $gallery_ids);
 
         echo $this->create_product_with_additional_data($prepared_data, $product_data, $sku);
         /**
@@ -109,14 +109,14 @@
      * @param $product_short_description
      * @param $sku
      * @param $regular_price
-     * @param $categories_id
+     * @param $category_ids
      * @param $all_attributes
      * @param $image_id
      * @param $gallery_ids
      * @param string $product_type
      * @return array
      */
-    public static function prepare_data($product_name, $product_description, $product_short_description, $sku, $regular_price, $categories_id, $all_attributes, $image_id, $gallery_ids, $product_type = 'simple') {
+    public static function prepare_data($product_name, $product_description, $product_short_description, $sku, $regular_price, $category_ids, $all_attributes, $image_id, $gallery_ids, $product_type = 'simple') {
       return [
         'type' => $product_type,
         'name' => $product_name,
@@ -124,7 +124,7 @@
         'short_description' => $product_short_description,
         'sku' => $sku,
         'regular_price' => $regular_price,
-        'category_id' => $categories_id,
+        'category_ids' => $category_ids,
         'attributes' => $all_attributes,
 //          'image_id' => $image_id,
 //          'gallery_ids' => $gallery_ids
