@@ -52,8 +52,8 @@
          */
         extract($main_data);
 
-        $image_id = self::attach_img($product_data[34])[0]; // First image from gallery
-        $gallery_ids = self::attach_img($product_data[34]);
+//        $image_id = self::attach_img($product_data[34])[0]; // First image from gallery
+//        $gallery_ids = self::attach_img($product_data[34]);
 
         $category_ids = Helper::get_categories($category_id);
         $all_attributes = Helper::make_attributes($this->attribute_slugs, $product_data);
@@ -81,7 +81,10 @@
           }
         }
       }
+
+
     }
+
 
     /**
      * Creates and saves product with standard info, attributes, images, price etc.

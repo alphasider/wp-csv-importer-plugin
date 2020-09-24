@@ -14,6 +14,7 @@
   $files = new View();
 
   new \NGS\CustomFields();
+
 ?>
 
 <div class="container" style="display: flex">

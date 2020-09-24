@@ -14,6 +14,7 @@
     require plugin_dir_path(__FILE__) . 'class/CSV.php';
     require plugin_dir_path(__FILE__) . 'class/Ajax.php';
     require plugin_dir_path(__FILE__) . 'class/CustomFields.php';
+    require plugin_dir_path(__FILE__) . 'class/File.php';
   }
 
   csv_importer_init();
