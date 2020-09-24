@@ -15,6 +15,9 @@
 
   new \NGS\CustomFields();
 
+//  echo '<pre>';
+//  print_r(\NGS\Database::get_all_files());
+//  echo '</pre>';
 ?>
 
 <div class="container" style="display: flex">
@@ -52,6 +55,7 @@
         jQuery('.import-btn').click(function () {
           jQuery('.default-text').removeClass('show');
           jQuery('.loader-wrapper').addClass('show');
+
           let data = {
             action: 'import_csv',
             fileName: jQuery(this).attr('data-filename'),

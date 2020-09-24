@@ -8,7 +8,8 @@
 
     /**
      * TODO:
-     *  1. Get data
+     *  1. Display data
+     *  2.
      */
     /**
      * @param $filename
@@ -32,5 +33,21 @@
       );
       return $wpdb->insert_id;
 
+    }
+
+    /**
+     * @return array|object|null
+     */
+    public static function get_all_files() {
+      global $wpdb;
+      $table = $wpdb->prefix . 'ci_import_logs';
+
+      return $wpdb->get_results(
+        "
+                SELECT *
+                FROM $table
+              ",
+        ARRAY_A
+      );
     }
   }
