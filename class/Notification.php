@@ -54,4 +54,12 @@
     public static function file_is_empty($filename ) {
       echo "<p class='notification notification_failure'>The file <b>{$filename}</b> is empty! Import is not possible.</p>";
     }
+
+    public static function file_import_success($filename){
+      echo "<p class='notification notification_success'>File <b>{$filename}</b> stored in the database successfully!</p>";
+    }
+
+    public static function file_import_failure($filename){
+      echo "<p class='notification notification_failure'>Something went wrong! File <b>{$filename}</b> has not been stored in the database!</p>";
+    }
   }

@@ -78,9 +78,9 @@
       $moved_file_id_in_db = Database::add_moved_file_to_db($file, $current_date, $current_date);
 
       if ((int)$moved_file_id_in_db && $is_file_moved) {
-        echo 'file moved';
+        Notification::file_import_success($file);
       } else {
-        echo 'File not stored in the database';
+        Notification::file_import_failure($file);
       }
     }
 
