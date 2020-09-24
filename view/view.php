@@ -10,11 +10,14 @@
 <h1>Import products from CSV</h1>
 
 <?php
-  //      $csv_data = CSV::get_csv('file.csv');
-  //      $prod = new Product();
-  //      $res = $prod->create_all_products($csv_data);
-  //      print_r($res);
+
   $files = new View();
+
+  new \NGS\CustomFields();
+
+//  echo '<pre>';
+//  print_r(\NGS\Database::get_all_files());
+//  echo '</pre>';
 ?>
 
 <div class="container" style="display: flex">
@@ -31,27 +34,28 @@
 
   <div class="right-column">
     <h2 class="heading-2">Results</h2>
-    <div class="notifications-area">
-      <div class="default-text show">The results will be displayed here</div>
-    </div>
-    <div class="loader-wrapper">
-      <div class="loader-text">Please be patient, it may take a long time</div>
-      <div class="loader "></div>
+    <div class="right-column__content">
+      <div class="notifications-area">
+        <div class="default-text show">Notifications area</div>
+      </div>
+      <div class="loader-wrapper">
+        <div class="loader-text">The process has been started, it may take a long time</div>
+        <div class="loader "></div>
+      </div>
     </div>
   </div>
 
 </div>
 
 <?php
-
   add_action('admin_print_footer_scripts', 'import_csv_javascript', 99);
-  function import_csv_javascript() {
-    ?>
+  function import_csv_javascript() { ?>
     <script>
       jQuery(document).ready(function ($) {
         jQuery('.import-btn').click(function () {
           jQuery('.default-text').removeClass('show');
           jQuery('.loader-wrapper').addClass('show');
+
           let data = {
             action: 'import_csv',
             fileName: jQuery(this).attr('data-filename'),
@@ -67,10 +71,7 @@
         })
       });
     </script>
-    <?php
-  }
-
-?>
+  <?php } ?>
 
 <style>
     .container {
@@ -80,7 +81,7 @@
     }
 
     .left-column {
-        width: 33%;
+        width: 40%;
     }
 
     .heading-2 {
@@ -91,10 +92,19 @@
         margin-bottom: 45px;
     }
 
+    .scheduled-label {
+        line-height: 2.5;
+    }
+
     .right-column {
-        width: 65%;
+        width: 57%;
+    }
+
+    .right-column__content {
+        height: 100%;
         justify-items: flex-end;
         position: relative;
+
     }
 
     .notifications-area {
@@ -131,15 +141,16 @@
     }
 
     .loader-wrapper {
-        display: none;
         position: absolute;
         top: 0;
         left: 0;
+        height: 100%;
+        width: 100%;
+        display: none;
         flex-direction: column-reverse;
         justify-content: center;
         align-items: center;
-        height: 100%;
-        width: 100%;
+        /*background-color: rgba(255, 255, 255, .5);*/
     }
 
     .loader {

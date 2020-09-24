@@ -5,6 +5,7 @@
   /**
    * Plugin Name: CSV importer
    * Description: Adds a custom admin pages with sample styles and scripts.
+   * Version: 2.0.
    */
 
   function csv_importer_init() {
@@ -12,9 +13,8 @@
     require plugin_dir_path(__FILE__) . 'class/Product.php';
     require plugin_dir_path(__FILE__) . 'class/CSV.php';
     require plugin_dir_path(__FILE__) . 'class/Ajax.php';
-
-
-    new \NGS\AdminPage();
+    require plugin_dir_path(__FILE__) . 'class/CustomFields.php';
+    require plugin_dir_path(__FILE__) . 'class/File.php';
   }
 
   csv_importer_init();

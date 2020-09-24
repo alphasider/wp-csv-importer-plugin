@@ -3,27 +3,104 @@
 
   namespace NGS;
 
-  use WC_Product;
-  use WC_Product_Attribute;
-  use WC_Product_External;
-  use WC_Product_Grouped;
-  use WC_Product_Simple;
-  use WC_Product_Variable;
+  use WC_Data_Exception;
+
+  require('Helper.php');
+  require('Notification.php');
 
   /**
    * Class Product
    * @package NGS
    */
   class Product {
-    // Custom function for product creation (For Woocommerce 3+ only)
-    private function create_product($args) {
+
+    public $attribute_slugs = [
+      3 => 'car_year',
+      4 => 'make',
+      5 => 'model',
+      7 => 'condition',
+      8 => 'mileage',
+      22 => 'interiorcolor',
+      23 => 'exteriorcolor',
+      31 => 'location'
+    ];
+
+    /**
+     * Main method. Imports all products from CSV file
+     *
+     * @param $csv_data
+     * @throws WC_Data_Exception
+     */
+    public function import_all_products($csv_data) {
+
+      $sold_out_products = Helper::detect_sold_out_products($csv_data);
+      Helper::delete_sold_out_products($sold_out_products);
+
+      foreach ($csv_data as $product_index => $product_data) {
+
+        $main_data = Helper::extract_main_data($product_data);
+
+        /**
+         * @var $sku
+         * @var $category_id
+         * @var $product_name
+         * @var $regular_price
+         * @var $image_updated_time
+         * @var $product_description
+         * @var $vehicle_updated_time
+         * @var $product_short_description
+         */
+        extract($main_data);
+
+//        $image_id = self::attach_img($product_data[34])[0]; // First image from gallery
+//        $gallery_ids = self::attach_img($product_data[34]);
+
+        $category_ids = Helper::get_categories($category_id);
+        $all_attributes = Helper::make_attributes($this->attribute_slugs, $product_data);
+
+        self::add_all_attributes_to_wp($this->attribute_slugs, $product_data);
+
+        // Preparing data for import
+        $prepared_data = Helper::prepare_data($product_name, $product_description, $product_short_description, $sku, $regular_price, $category_ids, $all_attributes, $image_id, $gallery_ids);
+        // Get product ID if it exists
+        $existing_product_id = Helper::get_existing_product_id($sku);
+
+        // Check if product data up-to-date
+        $is_product_up_to_date = self::check_is_product_up_to_date($existing_product_id, $vehicle_updated_time, $image_updated_time);
+
+        if ($existing_product_id == 0) {
+          // If product doesn't exist, CREATE it
+          $this->create_product_with_additional_data($prepared_data, $product_data, $sku);
+        } else if (!$is_product_up_to_date) {
+          // If product exists and out of date, then delete it (move the post (product) to the trash)
+          $deleted_product = $this->delete_product($existing_product_id);
+
+          if (is_object($deleted_product)) {
+            // If product has been deleted successfully, then recreate it with new data
+            $this->update_product($prepared_data, $product_data, $sku);
+          }
+        }
+      }
+
+
+    }
+
+
+    /**
+     * Creates and saves product with standard info, attributes, images, price etc.
+     *
+     * @param $args
+     * @return false|int
+     * @throws WC_Data_Exception
+     */
+    public function create_product($args) {
       global $woocommerce;
 
 //      if (!function_exists('wc_get_product_object_type') && !function_exists('wc_prepare_product_attributes'))
 //        return false;
 
       // Get an empty instance of the product object (defining it's type)
-      $product = $this->wc_get_product_object_type($args['type']);
+      $product = Helper::wc_get_product_object_type($args['type']);
       if (!$product)
         return false;
 
@@ -103,7 +180,7 @@
 
       // Attributes et default attributes
       if (isset($args['attributes']))
-        $product->set_attributes($this->wc_prepare_product_attributes($args['attributes']));
+        $product->set_attributes(Helper::wc_prepare_product_attributes($args['attributes']));
       if (isset($args['default_attributes']))
         $product->set_default_attributes($args['default_attributes']); // Needs a special formatting
 
@@ -128,141 +205,54 @@
       return $product->save();
     }
 
-    // Utility function that returns the correct product object instance
-    private function wc_get_product_object_type($type) {
-      // Get an instance of the WC_Product object (depending on his type)
-      if (isset($args['type']) && $args['type'] === 'variable') {
-        $product = new WC_Product_Variable();
-      } elseif (isset($args['type']) && $args['type'] === 'grouped') {
-        $product = new WC_Product_Grouped();
-      } elseif (isset($args['type']) && $args['type'] === 'external') {
-        $product = new WC_Product_External();
+    /**
+     * Creates product, sets values custom fields and notifies whether it succeed or failed
+     *
+     * @param array $prepared_data
+     * @param $product_data
+     * @param $product_sku
+     * @return string
+     * @throws WC_Data_Exception
+     */
+    public function create_product_with_additional_data(array $prepared_data, $product_data, $product_sku) {
+      $created_product_id = $this->create_product($prepared_data);
+      $this->set_custom_fields_values($created_product_id, $product_data);
+
+      if ($created_product_id == 0) {
+        Notification::create_new_product_failed($product_sku);
       } else {
-        $product = new WC_Product_Simple(); // "simple" By default
+        Notification::created_new_product_succeed($product_sku, $created_product_id);
       }
 
-      if (!is_a($product, 'WC_Product'))
-        return false;
-      else
-        return $product;
     }
 
-    // Utility function that prepare product attributes before saving
-    private function wc_prepare_product_attributes($attributes) {
-      global $woocommerce;
+    /**
+     * Updates product info and notifies
+     *
+     * @param $prepared_data
+     * @param $product_data
+     * @param $product_sku
+     * @throws WC_Data_Exception
+     */
+    public function update_product($prepared_data, $product_data, $product_sku) {
+      $created_product_id = $this->create_product($prepared_data);
+      $this->set_custom_fields_values($created_product_id, $product_data);
 
-      $data = array();
-      $position = 0;
-
-      foreach ($attributes as $taxonomy => $values) {
-        if (!taxonomy_exists($taxonomy))
-          continue;
-
-        // Get an instance of the WC_Product_Attribute Object
-        $attribute = new WC_Product_Attribute();
-
-        $term_ids = array();
-
-        // Loop through the term names
-        foreach ($values['term_names'] as $term_name) {
-          if (term_exists($term_name, $taxonomy))
-            // Get and set the term ID in the array from the term name
-            $term_ids[] = get_term_by('name', $term_name, $taxonomy)->term_id;
-          else
-            continue;
-        }
-
-        $taxonomy_id = wc_attribute_taxonomy_id_by_name($taxonomy); // Get taxonomy ID
-
-        $attribute->set_id($taxonomy_id);
-        $attribute->set_name($taxonomy);
-        $attribute->set_options($term_ids);
-        $attribute->set_position($position);
-        $attribute->set_visible($values['is_visible']);
-        $attribute->set_variation($values['for_variation']);
-
-        $data[$taxonomy] = $attribute; // Set in an array
-
-        $position++; // Increase position
-      }
-      return $data;
+      Notification::update_product_succeed($product_sku, $created_product_id);
     }
 
-    public function create_all_products($csv_data) {
-      $attribute_slugs = [
-        3 => 'car_year',
-        4 => 'make',
-        5 => 'model',
-        7 => 'condition',
-        10 => 'enginedescription',
-        11 => 'transmission',
-        12 => 'drivetrain',
-        13 => 'doors',
-        22 => 'interiorcolor',
-        23 => 'exteriorcolor',
-      ];
-      $all_attributes = [];
-
-      foreach ($csv_data as $product_index => $product_data) {
-        $sku = $product_data[2];
-        $category_id = $product_data[44];
-        $vehicle_updated_time = $product_data[42];
-        $image_updated_time = $product_data[43];
-
-        // Preparing attributes
-        foreach ($attribute_slugs as $column_index => $slug) {
-          $all_attributes["pa_{$slug}"] = [
-            'term_names' => [$product_data[$column_index]],
-            'is_visible' => true,
-            'for_variation' => false,
-          ];
-        }
-
-        // Preparing data for import
-        $product_info = [
-          'type' => '', // Simple product by default
-          'name' => $product_data[33],
-          'description' => $product_data[32],
-          'short_description' => $product_data[32],
-          'sku' => $sku,
-          'regular_price' => $product_data[17],
-          'reviews_allowed' => true,
-          'attributes' => $all_attributes,
-          'category_ids' => self::get_category($category_id),
-//          'image_id' => self::attach_img($product_data[34])[0], // First image from gallery
-//          'gallery_ids' => self::attach_img($product_data[34])
-        ];
-
-        // Get product ID if it exists
-        $existing_product_id = self::get_existing_product_id($sku);
-
-        // Check if product data up-to-date
-        $is_product_up_to_date = self::check_modified_date($existing_product_id, $vehicle_updated_time, $image_updated_time);
-
-        // If product doesn't exist, CREATE it
-        if ($existing_product_id == 0) {
-          $created_product_id = $this->create_product($product_info);
-          // Notify whether product has been created or not
-          echo self::show_create_product_notification($created_product_id, $sku);
-          $created_products_id[$sku] = self::show_create_product_notification($created_product_id, $sku);
-
-        } else if (!$is_product_up_to_date) {
-          // If product exists and out of date, then delete it
-
-          // Move the post (product) to the trash
-          $deleted_product = wp_trash_post($existing_product_id);
-//          echo("Product with ID: {$existing_product_id} and SKU: {$sku} has been deleted <br>");
-
-          if (is_object($deleted_product)) {
-            // If product has been deleted successfully, then recreate it with new data
-            $created_product_id = $this->create_product($product_info);
-            echo self::show_product_update_notification($created_product_id, $sku);
-            $created_products_id[] = $created_product_id;
-          }
-        }
-      }
+    /**
+     * Deletes product
+     *
+     * @param $product_id
+     * @return array|false|\WP_Post|null
+     */
+    public function delete_product($product_id) {
+      return wp_trash_post($product_id);
     }
 
+
+    /*** SECONDARY PRODUCT OPERATIONS ***/
 
     /**
      * Uploads images & returns ID
@@ -280,126 +270,75 @@
     }
 
     /**
-     * Gets category id from CSV file
+     * Sets custom fields values
      *
-     * @param $categories_id
-     * @return array
-     */
-    private static function get_category($categories_id) {
-      /**
-       * Category ID in CSV | Category ID in WordPress | Category Name
-       * 1                  | 26                       | Automotive
-       * 2                  | 27                       | Motorcycle
-       * 3                  | 28                       | Powersports
-       * 4                  | 29                       | Marine
-       * 5                  | 30                       | Commercial
-       * 6                  | 31                       | RV/camper
-       * 7                  | 59                       | Spare
-       * */
-      $category_id = [];
-
-      switch ($categories_id) {
-        case 1:
-          $category_id[] .= 26;
-          break;
-        case 2:
-          $category_id[] .= 27;
-          break;
-        case 3:
-          $category_id[] .= 28;
-          break;
-        case 4:
-          $category_id[] .= 29;
-          break;
-        case 5:
-          $category_id[] .= 30;
-          break;
-        case 6:
-          $category_id[] .= 31;
-          break;
-        case 7:
-          $category_id[] .= 59;
-          break;
-      }
-
-      return $category_id;
-    }
-
-    /**
      * @param $product_id
-     * @param $product_sku
-     * @return string
+     * @param $csv_data
      */
-    private static function show_create_product_notification($product_id, $product_sku) {
-      if ($product_id == 0) {
-        return "<p  class='notification notification_failure'>Could not add a new product. <b>SKU: {$product_sku} </b> has not been created!</p>";
-      } else {
-        return "<p  class='notification notification_success'>Added new product. <b>SKU: {$product_sku}</b> | <b>ID: {$product_id}</b></p>";
-      }
+    private function set_custom_fields_values($product_id, $csv_data) {
+      $vin = $csv_data[1];
+      $stock_id = $csv_data[2];
+      $engine = $csv_data[10];
+      $transmission = $csv_data[11];
+      $drivetrain = $csv_data[12];
+      $doors = $csv_data[13];
+      $body_type = $csv_data[14];
+      $trim = $csv_data[6];
+      $description = $csv_data[32];
+      $standard_features = $csv_data[30];
+      $video = $csv_data[37];
+
+      // Adding data to the custom fields
+      update_field('field_vin', $vin, $product_id);
+      update_field('field_stock_id', $stock_id, $product_id);
+      update_field('field_engine', $engine, $product_id);
+      update_field('field_transmission', $transmission, $product_id);
+      update_field('field_drivetrain', $drivetrain, $product_id);
+      update_field('field_doors', $doors, $product_id);
+      update_field('field_body_type', $body_type, $product_id);
+      update_field('field_trim', $trim, $product_id);
+      update_field('field_description', $description, $product_id);
+      update_field('field_standard_features', $standard_features, $product_id);
+      update_field('field_video', $video, $product_id);
     }
 
     /**
-     * @param $created_product_id
-     * @return string
-     */
-    private static function show_product_update_notification($created_product_id, $product_sku) {
-      return "<p class='notification notification_success'>Product has been updated. <b>SKU: {$product_sku}</b> | <b>ID: {$created_product_id}</b></p>";
-    }
-
-    /**
-     * @param $sku
-     * @return int
-     */
-    public static function get_existing_product_id($sku) {
-      return wc_get_product_id_by_sku($sku);
-    }
-
-    /**
+     * Checks is product up-to-date according to columns:
+     * - vehicle_last_updated
+     * - image_last_updated
+     *
      * @param $post_id
      * @param $vehicle_last_updated
      * @param $image_last_updated
      * @return bool
      */
-    public static function check_modified_date($post_id, $vehicle_last_updated, $image_last_updated) {
+    public static function check_is_product_up_to_date($post_id, $vehicle_last_updated, $image_last_updated) {
       $is_product_up_to_date = true;
       $post_updated_time = get_the_modified_date('Y-m-N H:i:s', $post_id);
 
       // Get rid of unnecessary ending zero values
-      $vehicle_last_updated = self::clear_data($vehicle_last_updated);
-      $image_last_updated = self::clear_data($image_last_updated);
+      $vehicle_last_updated = substr($vehicle_last_updated, 0, strpos($vehicle_last_updated, '.'));
+      $image_last_updated = substr($image_last_updated, 0, strpos($image_last_updated, '.'));
 
       // Get last changed column
-      $up_to_date_column = self::get_files_last_modification($vehicle_last_updated, $image_last_updated);
+      $up_to_date_column = Helper::get_files_last_modification($vehicle_last_updated, $image_last_updated);
 
       // Check if post up-to-date
-      if ($up_to_date_column > $post_updated_time) {
-        $is_product_up_to_date = false;
-      }
+      if ($up_to_date_column > $post_updated_time) $is_product_up_to_date = false;
 
       return $is_product_up_to_date;
     }
 
     /**
-     * @param $vehicle_last_updated
-     * @param $image_last_updated
-     * @return mixed
+     * Adds all possible attribute values to wp to assign them later
+     *
+     * @param $attributes
+     * @param $prepared_data
      */
-    public static function get_files_last_modification($vehicle_last_updated, $image_last_updated) {
-      if ($vehicle_last_updated > $image_last_updated) {
-        return $vehicle_last_updated;
-      } else {
-        return $image_last_updated;
+    public static function add_all_attributes_to_wp($attributes, $prepared_data) {
+      foreach ($attributes as $column_num => $attribute) {
+        wp_insert_term($prepared_data[$column_num], "pa_{$attribute}");
       }
-    }
-
-
-
-    /**
-     * @param $data
-     * @return false|string
-     */
-    public static function clear_data($data) {
-      return substr($data, 0, strpos($data, '.'));
     }
 
   }

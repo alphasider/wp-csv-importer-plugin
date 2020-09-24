@@ -33,18 +33,19 @@
     public function show_files_to_import(string $import_type) {
 
       $files = '';
+      $file_size = null;
 
       if ($import_type == 'new') {
         $files = $this->get_files_from($this->files_to_import_dir);
-      } else if ($import_type == 'restore') {
-        $files = $this->get_files_from($this->imported_files_dir);
-      }
 
+      } else if ($import_type == 'restore') {
+//        $files = $this->get_files_from($this->imported_files_dir);
+        $files = (array) Database::get_all_files();
+      }
 
       $output = "";
 
-      if (count($files) >= 1) {
-
+      if (count($files) >= 1 && $file_size !== 0 && (count($files) > 0)) {
         $output .= "<table>";
 
         // Add table header to imported files table
@@ -61,24 +62,78 @@
         $output .= "  <tbody>";
 
         foreach ($files as $file) {
+          $filename = isset($file['file_name']) ? $file['file_name'] : $file;
+          $file_id = isset($file['id']) ? $file['id'] : '';
+
           $output .= "<tr>";
-          $output .= "  <td> {$file} </td>";
+          $output .= "  <td>{$filename}</td>";
 
           if ($import_type !== 'new') {
-            //
-            $output .= "<td> " . CSV::get_files_last_modified_time($file, $import_type) . "</td>";
+            $output .= "<td> {$file['last_modified']} </td>";
           };
 
-          $output .= "  <td> <button class='import-btn' data-filename='{$file}' data-importType='{$import_type}'>Import</button> </td>";
-          $output .= "</tr>";
+          $output .= "  <td>";
+          $output .= "<button class='import-btn' data-filename='{$filename}' data-importType='{$import_type}'>Import</button>";
+
+          $output .= "     </td > ";
+          $output .= "</tr > ";
+
         }
 
-        $output .= "  </tbody>";
-        $output .= "</table>";
+        $output .= "  </tbody > ";
+        $output .= "</table > ";
       } else {
         $output = "There is no files to import";
       }
       return $output;
+
+      /*
+            $output = "";
+
+            if (count($files) >= 1 && $file_size !== 0 && (count($files) > 0)) {
+
+
+              $output .= "<table>";
+
+              // Add table header to imported files table
+              if ($import_type !== 'new') {
+                $output .= "  <thead>";
+                $output .= "    <tr class='table-head'>";
+                $output .= "      <th class='column1'>File name</th>";
+                $output .= "      <th class='column2'>Last modified at</th>";
+                $output .= "      <th class='column3'>Action</th>";
+                $output .= "    </tr>";
+                $output .= "  </thead>";
+              }
+
+              $output .= "  <tbody>";
+
+              foreach ($files as $file) {
+                $output .= "<tr>";
+                $output .= "  <td> {$file} </td>";
+
+                if ($import_type !== 'new') {
+                  $output .= "<td> " . File::get_files_last_modified_time($file, $import_type) . "</td>";
+                };
+
+                $output .= "  <td>";
+                  $output .= "<button class='import-btn' data-filename='{$file}' data-importType='{$import_type}'>Import</button>";
+      //          if ($import_type !== 'new') {
+      //            $output .= "<button class='import-btn' data-filename='{$file}' data-importType='{$import_type}'>Import</button>";
+      //          } else {
+      //            $output .= " <div class='scheduled-label'> Scheduled</div > ";
+      //          }
+                $output .= "     </td > ";
+                $output .= "</tr > ";
+              }
+
+              $output .= "  </tbody > ";
+              $output .= "</table > ";
+            } else {
+              $output = "There is no files to import";
+            }
+            return $output;
+      */
     }
   }
 
