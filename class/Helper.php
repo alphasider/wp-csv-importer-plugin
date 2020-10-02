@@ -262,4 +262,20 @@
     public static function get_current_date() {
       return date('Y-m-N H:i:s');
     }
+
+    /**
+     * @param $id
+     * @param $array
+     * @return null
+     */
+    public static function searchByValue($id, $array) {
+      foreach ($array as $key => $val) {
+        if ($val['id'] === $id) {
+          $output['id'] = $val['id'];
+          $output['name'] = $val['file_name'];
+          return $output;
+        }
+      }
+      return null;
+    }
   }

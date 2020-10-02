@@ -81,10 +81,7 @@
           }
         }
       }
-
-
     }
-
 
     /**
      * Creates and saves product with standard info, attributes, images, price etc.

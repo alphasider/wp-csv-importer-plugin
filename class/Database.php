@@ -16,12 +16,8 @@
      * @return int
      */
     public static function add_imported_file_to_db($filename, $import_date) {
-      $is_there_file_to_delete = self::check_files_to_delete();
-      if($is_there_file_to_delete){
-        $file_to_delete = self::get_the_oldest_file(self::get_all_files_list());
-        self::delete_file($file_to_delete);
-      }
-      
+      self::delete_the_oldest_file();
+
       global $wpdb;
       $table = $wpdb->prefix . self::$table_name;
 
@@ -58,17 +54,25 @@
     }
 
     /**
-     * Gets the oldest (imported) file id
+     * Gets the oldest (imported) file's id & name
      *
      * @param $files
-     * @return array
+     * @return array|null
      */
     public static function get_the_oldest_file($files) {
-      $ids = [];
+      $old_files = [];
       foreach ($files as $file) {
-        $ids[] = $file['id'];
+        $old_files[$file['id']] = $file['file_name'];
       }
-      return min($ids);
+
+      // Get the oldest file id & name in the DB
+      $oldest_file_id = min(array_keys($old_files));
+      $oldest_file_name = $old_files[$oldest_file_id];
+
+      return [
+        'id' => $oldest_file_id,
+        'name' => $oldest_file_name
+      ];
     }
 
     /**
@@ -83,12 +87,25 @@
 
     /**
      * Checks if there files to delete
-     * 
+     *
      * @return bool
      */
     public static function check_files_to_delete() {
       $all_imported_files = self::get_all_files_list();
       $files_count = count($all_imported_files);
       return $files_count >= 7;
+    }
+
+    /**
+     * Deletes the oldest file from the DB if it is necessary
+     */
+    public static function delete_the_oldest_file() {
+      $is_there_file_to_delete = self::check_files_to_delete();
+
+      if ($is_there_file_to_delete) {
+        $file_to_delete = self::get_the_oldest_file(self::get_all_files_list());
+        self::delete_file($file_to_delete['id']);
+        return $file_to_delete;
+      }
     }
   }
