@@ -19,7 +19,6 @@
       $is_there_file_to_delete = self::check_files_to_delete();
       if($is_there_file_to_delete){
         $file_to_delete = self::get_the_oldest_file(self::get_all_files_list());
-        echo $file_to_delete;
         self::delete_file($file_to_delete);
       }
       

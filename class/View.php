@@ -73,7 +73,7 @@
           };
 
           $output .= "  <td>";
-          $output .= "<button class='import-btn' data-filename='{$filename}' data-importType='{$import_type}'>Import</button>";
+          $output .= "<button class='import-btn' data-filename='{$filename}' data-importType='{$import_type}'>Reimport</button>";
 
           $output .= "     </td > ";
           $output .= "</tr > ";

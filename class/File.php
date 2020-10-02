@@ -22,31 +22,6 @@
     }
 
     /**
-     * TODO:
-     *  1. Create a log file
-     *  2. Write imported date into log file on the first import
-     *  3. Display imported date
-     *  _______________________________________________________
-     *  Method:
-     *  1. To create a log file
-     *  2.
-     *
-     *
-     * File
-     */
-
-    public static function create_log_file() {
-      $path = plugin_dir_path(__DIR__) . 'inc/';
-      $log_file = fopen("{$path}import_log.txt", "w") or die("Can't create a log file");
-      fclose($log_file);
-    }
-
-    public static function write_log($file_name, $content) {
-      $file = fopen($file_name, 'w');
-      fwrite($file, $content);
-    }
-
-    /**
      * Moves files
      *
      * @param $file
