@@ -72,10 +72,10 @@
      */
     public static function handle_imported_files($file, $import_type) {
 
-      $last_modified_date = self::set_modified_date($file, $import_type);
+//      $last_modified_date = self::set_modified_date($file, $import_type);
       $current_date = Helper::get_current_date();
       $is_file_moved = self::move_imported_file($file);
-      $moved_file_id_in_db = Database::add_moved_file_to_db($file, $current_date, $current_date);
+      $moved_file_id_in_db = Database::add_imported_file_to_db($file, $current_date);
 
       if ((int)$moved_file_id_in_db && $is_file_moved) {
         Notification::file_import_success($file);

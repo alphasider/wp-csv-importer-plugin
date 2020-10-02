@@ -40,7 +40,7 @@
 
       } else if ($import_type == 'restore') {
 //        $files = $this->get_files_from($this->imported_files_dir);
-        $files = (array) Database::get_all_files();
+        $files = (array) Database::get_all_files_list();
       }
 
       $output = "";
