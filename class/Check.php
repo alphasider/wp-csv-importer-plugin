@@ -8,17 +8,6 @@
    * @package NGS
    */
   class Check {
-    /**
-     * TODO:
-     * DONE 1. Check if the product exists by SKU
-     * TODO 2. If there is a product:
-     * TODO   2.1. Check if is it up-to-date (by ‘vehicle last updated’ and ‘image last updated’ columns):
-     *          2.1. HowToDo: get greater value (date) of the 'vehicle last updated' and 'mage last updated' -> compare it with post updated time
-     * TODO     2.1.1. If it is, SKIP
-     * TODO     2.1.2. If not, UPDATE
-     * DONE 3. If there is no one, CREATE
-     */
-
 
     /**
      * @param $sku

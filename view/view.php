@@ -10,18 +10,8 @@
 <h1>Import products from CSV</h1>
 
 <?php
-
   $files = new View();
-
   new \NGS\CustomFields();
-
-//  $files_in_db = \NGS\Database::get_all_files_list();
-//  $ids = \NGS\Database::get_the_oldest_file($files_in_db);
-//  echo '<pre>';
-//  print_r($ids);
-//  echo '</pre>';
-//    \NGS\Database::delete_file($ids);
-  
 ?>
 
 <div class="container" style="display: flex">
